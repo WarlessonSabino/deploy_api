@@ -1,7 +1,7 @@
 export default {
-    host: '192.168.1.128',
+    host: 'pharmesjf2.ddns.net',
     port: 3050,
-    database: 'C:/FCerta/DB/ALTERDB.IB', // Use apenas o caminho no servidor
+    database: 'C:/FCerta/DB/ALTERDB.IB', 
     user: 'SYSDBA',
     password: 'masterkey',
     lowercase_keys: false, 

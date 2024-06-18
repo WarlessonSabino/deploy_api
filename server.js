@@ -8,7 +8,7 @@ app.get('/requisicoes', (req, res) => {
     const queryParam = req.query.cpf;
 
     if (!queryParam) {
-        return res.status(400).send('Parametro nrrqu é obrigatório');
+        return res.status(400).send('Parametro cpf é obrigatório');
     }
 
     const options = dbConfig;
@@ -52,5 +52,5 @@ app.get('/requisicoes', (req, res) => {
 });
 
 app.listen(3000, () => {
-    console.log('API em funcionamento na porta 3000');
+    console.log('API em funcionamento.');
 });
