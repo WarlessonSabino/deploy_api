@@ -19,17 +19,34 @@ app.get('/requisicoes', (req, res) => {
         }
 
         const sqlQuery = `
-            SELECT          
+                SELECT          
                 fc15100.cdfil || ' - ' || fc15100.nrorc || ' - ' || fc15100.serieo as "N° Orçamento",
                 fc15100.prcobr AS "Valor_Bruto",
                 fc15100.vrdsc AS "Valor_Desconto",
-                fc15100.prcobr - fc15100.vrdsc AS "Valor a Pagar"
+                fc15100.prcobr - fc15100.vrdsc AS "Valor a Pagar",
+                CAST(LEFT(LIST(fc03000.descrprd || ' ' || REPLACE(CAST(ROUND(fc15110.quant, 3) AS VARCHAR(255)), '.', ',') || ' ' || fc15110.unida), 255) AS VARCHAR(255)) AS "Componentes da Fórmula"
+
             FROM
                 fc15100
+
+
+            LEFT JOIN
+            fc15110 on fc15110.nrorc = fc15100.nrorc AND fc15110.cdfil = fc15100.cdfil and fc15110.serieo = fc15100.serieo
+
+
+            LEFT JOIN
+            fc03000 on fc03000.cdpro = fc15110.cdprin
+                
+
             WHERE
                 fc15100.nrorc = ? 
             AND
                 fc15100.cdfil = ?
+
+            GROUP BY 
+            fc15100.cdfil || ' - ' || fc15100.nrorc || ' - ' || fc15100.serieo,
+            fc15100.prcobr,
+            fc15100.vrdsc    
         `;
 
         db.query(sqlQuery, [nrorc, cdfil], (err, result) => {
