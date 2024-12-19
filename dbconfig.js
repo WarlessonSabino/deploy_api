@@ -1,7 +1,7 @@
 export default {
     host: 'cc210d91443c.sn.mynetname.net',
     port: 3050,
-    database: 'C:/FCerta/DB/ALTERDB.IB', 
+    database: 'C:\FCerta\DB\alterdb.ib', 
     user: 'SYSDBA',
     password: 'masterkey',
     lowercase_keys: false, 
