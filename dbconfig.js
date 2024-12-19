@@ -1,5 +1,5 @@
 export default {
-    host: 'pharmesjf2.ddns.net',
+    host: 'cc210d91443c.sn.mynetname.net',
     port: 3050,
     database: 'C:/FCerta/DB/ALTERDB.IB', 
     user: 'SYSDBA',
