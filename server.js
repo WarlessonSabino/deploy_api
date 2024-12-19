@@ -5,42 +5,39 @@ import dbConfig from './dbconfig.js';
 const app = express();
 
 app.get('/requisicoes', (req, res) => {
-    const queryParam = req.query.cpf;
+    const { nrorc, cdfil } = req.query;
 
-    if (!queryParam) {
-        return res.status(400).send('Parametro cpf é obrigatório');
+    if (!nrorc || !cdfil) {
+        return res.status(400).send('Parâmetros nrorc e cdfil são obrigatórios');
     }
 
     const options = dbConfig;
 
     Firebird.attach(options, (err, db) => {
         if (err) {
-            console.error('Erro ao conectar ao banco de dados:', err);
             return res.status(500).send('Erro ao conectar ao banco de dados');
         }
 
         const sqlQuery = `
-            SELECT
-                fc12100.cdfil,
-                fc12100.nrrqu,
-                fc12100.serier,
-                fc12100.dtentr,
-                fc12100.nomepa
+            SELECT          
+                fc15100.cdfil || ' - ' || fc15100.nrorc || ' - ' || fc15100.serieo as "N° Orçamento",
+                fc15100.prcobr AS "Valor_Bruto",
+                fc15100.vrdsc AS "Valor_Desconto",
+                fc15100.prcobr - fc15100.vrdsc AS "Valor a Pagar"
             FROM
-                fc12100
+                fc15100
             WHERE
-                fc12100.cpfclientedav = ?
+                fc15100.nrorc = ? 
+            AND
+                fc15100.cdfil = ?
         `;
 
-        db.query(sqlQuery, [queryParam], (err, result) => {
+        db.query(sqlQuery, [nrorc, cdfil], (err, result) => {
             db.detach();
 
             if (err) {
-                console.error('Erro ao executar a consulta:', err);
                 return res.status(500).send('Erro ao executar a consulta');
             }
-
-            console.log('Resultado da consulta:', result);
 
             if (result.length === 0) {
                 return res.status(404).send('Nenhum registro encontrado');
