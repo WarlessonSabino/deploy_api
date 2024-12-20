@@ -281,12 +281,16 @@ Totais Consolidados:
         <div>💲 Total Geral: <span>R$ ${formatter.format(totalGeral)}</span></div>
     `;
 
-    document.getElementById('copyButton').onclick = () => {
-        navigator.clipboard.writeText(copiedText).then(() => {
-            alert('Orçamentos copiados com sucesso!');
-        });
-    };
-}
+document.getElementById('copyButton').onclick = () => {
+    const tempInput = document.createElement('textarea');
+    tempInput.value = copiedText;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy'); // Método legado, mas funcional em HTTP
+    document.body.removeChild(tempInput);
+    alert('Orçamentos copiados com sucesso!');
+};
+
 
 
 </script>
