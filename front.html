@@ -140,9 +140,9 @@
         <div id="selectedOrcamentos"></div>
 
         <div class="totals" id="totals">
-            <div>Total Bruto: <span>R$ 0.00</span></div>
-            <div>Total Desconto: <span>R$ 0.00</span></div>
-            <div>Total Geral: <span>R$ 0.00</span></div>
+            <div>💰 Total Bruto: <span>R$ 0.00</span></div>
+            <div>🎉Total Desconto: <span>R$ 0.00</span></div>
+            <div>💲Total Geral: <span>R$ 0.00</span></div>
         </div>
         <button id="copyButton" style="display: none;">Copiar Orçamentos</button>
     </div>
@@ -213,8 +213,26 @@
     selectedContainer.innerHTML = '';
     let totalBruto = 0;
     let totalDesconto = 0;
-    let valorGeral = 0;
+    let totalGeral = 0;
     let copiedText = '';
+
+    const introMessage = `
+✨ Obrigado por escolher nossa farmácia de manipulação! ✨
+
+Seu orçamento foi concluído com sucesso e está prontinho para atender suas necessidades com qualidade e cuidado. Confira os detalhes abaixo:
+
+`;
+
+    const conclusionMessage = `
+💡 Próximos Passos:
+👉 Assim que aprovado, nossa equipe começa imediatamente a manipular sua fórmula com todo o cuidado que você merece. Qualquer dúvida, estamos prontos para ajudar!
+
+Conte conosco para sua saúde e bem-estar!
+
+💚 Pharmes, sempre ao seu lado.
+`;
+
+    copiedText += introMessage; 
 
     document.querySelectorAll('.orcamento-checkbox:checked').forEach(checkbox => {
         const bruto = parseFloat(checkbox.getAttribute('data-bruto'));
@@ -223,43 +241,54 @@
 
         totalBruto += bruto;
         totalDesconto += desconto;
-        valorGeral = bruto - desconto;
+        totalGeral += bruto - desconto;
 
         const formattedBruto = formatter.format(bruto);
         const formattedDesconto = formatter.format(desconto);
-        const formattedGeral = formatter.format(valorGeral);
+        const formattedGeral = formatter.format(bruto - desconto);
 
         const message = document.createElement('div');
         message.classList.add('message');
         message.innerHTML = `
-            <strong>Orçamento:</strong> ${checkbox.parentNode.textContent.trim()}<br>
+            <strong>💊 Orçamento N:</strong> ${checkbox.parentNode.textContent.trim()}<br>
             <strong>Bruto:</strong> R$ ${formattedBruto} | <strong>Desconto:</strong> R$ ${formattedDesconto} | <strong>Geral:</strong> R$ ${formattedGeral}<br>
-            <strong>Componentes da Fórmula:</strong> ${componentes}
+            <strong>📦 Fórmula Manipulada:</strong> ${componentes}<br>
         `;
         selectedContainer.appendChild(message);
 
+   
         copiedText += `
-Orçamento: ${checkbox.parentNode.textContent.trim()}
+💊 Orçamento N: ${checkbox.parentNode.textContent.trim()}
 Bruto: R$ ${formattedBruto} | Desconto: R$ ${formattedDesconto} | Geral: R$ ${formattedGeral}
-Componentes da Fórmula: ${componentes}\n\n`;
+📦 Fórmula Manipulada: ${componentes}\n\n`;
     });
 
+
+    copiedText += `
+Totais Consolidados:
+💰 Total Bruto: R$ ${formatter.format(totalBruto)}
+🎉 Total Desconto: R$ ${formatter.format(totalDesconto)}
+💲 Total Geral: R$ ${formatter.format(totalGeral)}
+
+`;
+
+    
+    copiedText += conclusionMessage;
+
     totalsContainer.innerHTML = `
-        <div>Total Bruto: <span>R$ ${formatter.format(totalBruto)}</span></div>
-        <div>Total Desconto: <span>R$ ${formatter.format(totalDesconto)}</span></div>
-        <div>Total Geral: <span>R$ ${formatter.format(valorGeral)}</span></div>
+        <div>💰 Total Bruto: <span>R$ ${formatter.format(totalBruto)}</span></div>
+        <div>🎉 Total Desconto: <span>R$ ${formatter.format(totalDesconto)}</span></div>
+        <div>💲 Total Geral: <span>R$ ${formatter.format(totalGeral)}</span></div>
     `;
 
     document.getElementById('copyButton').onclick = () => {
-        navigator.clipboard.writeText(
-            copiedText +
-            `\nTotal Bruto: R$ ${formatter.format(totalBruto)}\nTotal Desconto: R$ ${formatter.format(totalDesconto)}\nTotal Geral: R$ ${formatter.format(valorGeral)}`
-        ).then(() => {
+        navigator.clipboard.writeText(copiedText).then(() => {
             alert('Orçamentos copiados com sucesso!');
         });
     };
 }
 
-    </script>
+
+</script>
 </body>
 </html>
