@@ -160,7 +160,7 @@
             }
 
             try {
-                const response = await fetch(`http://3.19.234.123:3000/requisicoes?nrorc=${nrorc}&cdfil=${cdfil}`);
+                const response = await fetch(`http://localhost:3000/requisicoes?nrorc=${nrorc}&cdfil=${cdfil}`);
                 if (!response.ok) {
                     throw new Error('Erro ao buscar os dados');
                 }
@@ -282,10 +282,30 @@ Totais Consolidados:
     `;
 
     document.getElementById('copyButton').onclick = () => {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(copiedText).then(() => {
             alert('Orçamentos copiados com sucesso!');
+        }).catch(err => {
+            console.error('Erro ao copiar para a área de transferência:', err);
+            alert('Não foi possível copiar os orçamentos automaticamente. Tente copiar manualmente.');
         });
-    };
+    } else {
+        // Fallback para navegadores que não suportam Clipboard API
+        const textarea = document.createElement('textarea');
+        textarea.value = copiedText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            alert('Orçamentos copiados com sucesso!');
+        } catch (err) {
+            console.error('Erro ao copiar usando execCommand:', err);
+            alert('Não foi possível copiar os orçamentos automaticamente. Tente copiar manualmente.');
+        }
+        document.body.removeChild(textarea);
+    }
+};
+
 }
 
 
