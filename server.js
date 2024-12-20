@@ -1,19 +1,11 @@
 import express from 'express';
 import Firebird from 'node-firebird';
-import path from 'path';
 import dbConfig from './dbconfig.js';
 import cors from 'cors';
 
 const app = express();
-
-// Enable CORS for cross-origin requests
 app.use(cors());
 
-// Serve static files from the root directory
-const __dirname = path.resolve();
-app.use(express.static(__dirname));
-
-// API route for requisitions
 app.get('/requisicoes', (req, res) => {
     const { nrorc, cdfil } = req.query;
 
@@ -73,14 +65,6 @@ app.get('/requisicoes', (req, res) => {
     });
 });
 
-
-// Catch-all route to serve the front-end application
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`API em funcionamento na porta ${PORT}.`);
+app.listen(3000, () => {
+    console.log('API em funcionamento.');
 });
