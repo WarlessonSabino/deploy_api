@@ -26,7 +26,42 @@ app.get('/requisicoes', (req, res) => {
                 fc15100.prcobr AS "Valor_Bruto",
                 fc15100.vrdsc AS "Valor_Desconto",
                 fc15100.prcobr - fc15100.vrdsc AS "Valor a Pagar",
-                CAST(LEFT(LIST(fc15110.DESCR || ' ' || REPLACE(CAST(ROUND(fc15110.quant, 0) AS VARCHAR(255)), '.', ',') || ' ' || fc15110.unida), 255) AS VARCHAR(255)) AS "Componentes da Fórmula"
+
+            CASE fc15100.tpformafarma
+                WHEN 0  THEN 'Indefinido'
+                WHEN 1  THEN 'Cápsula'
+                WHEN 2  THEN 'Creme'
+                WHEN 3  THEN 'Loção'
+                WHEN 4  THEN 'Shampoo'
+                WHEN 5  THEN 'Outras'
+                WHEN 6  THEN 'Unidades'
+                WHEN 7  THEN 'Homeopatia'
+                WHEN 8  THEN 'Floral'
+                WHEN 9  THEN 'Comprimido'
+                WHEN 10 THEN 'Gel'
+                WHEN 11 THEN 'Pomada'
+                WHEN 12 THEN 'Xarope'
+                WHEN 13 THEN 'Filtro Solar'
+                WHEN 14 THEN 'Injetável'
+                WHEN 15 THEN 'Envelope'
+                WHEN 16 THEN 'Biscoito Medicamentoso'
+                WHEN 17 THEN 'Pastilha Medicamentosa'
+                WHEN 18 THEN 'Patch Gel'
+                WHEN 19 THEN 'Filmes'
+                WHEN 20 THEN 'Pasta Oral'
+                WHEN 21 THEN 'Solução Oral'
+                ELSE 'Não Definido'
+            END AS "Fórmula Farmacêutica",
+
+
+            CASE fc15100.tpformafarma
+
+                WHEN 1 THEN  (ROUND(fc15100.volume,0) || ' ' || 'Cápsulas' || ' ' || ' tomar ' || ' ' || ROUND(fc15100.qtcont,0) || ' ' || 'por dia.')
+                ELSE ( ROUND(fc15100.volume,0) || ' ' || fc15100.univol)
+                
+            END AS "Quantidade",
+
+                CAST(LEFT(LIST(fc15110.DESCR || ' ' || REPLACE(CAST(ROUND(fc15110.quant, 0) AS VARCHAR(255)), '.', ',') || ' ' || LOWER(fc15110.unida)), 255) AS VARCHAR(255)) AS "Componentes da Fórmula"
 
             FROM
                 fc15100
@@ -35,18 +70,30 @@ app.get('/requisicoes', (req, res) => {
             LEFT JOIN
             fc15110 on fc15110.nrorc = fc15100.nrorc AND fc15110.cdfil = fc15100.cdfil and fc15110.serieo = fc15100.serieo
 
+            LEFT JOIN
+            fc12004 on fc12004.codigo = fc15100.tpformafarma
+
 
             WHERE
                 fc15100.nrorc = ? 
             AND
                 fc15100.cdfil = ?
 
-            AND fc15110.tpcmp = 'C'    
+            AND 
+                fc15110.tpcmp = 'C'  
+            AND 
+                fc15110.unida <> '%A'    
+
 
             GROUP BY 
             fc15100.cdfil || ' - ' || fc15100.nrorc || ' - ' || fc15100.serieo,
             fc15100.prcobr,
-            fc15100.vrdsc 
+            fc15100.vrdsc,
+            fc15100.volume,
+            fc15100.qtcont,
+            fc15100.tpformafarma,
+            fc15100.univol,
+            fc12004.forma_farmaceutica 
         `;
 
         db.query(sqlQuery, [nrorc, cdfil], (err, result) => {
