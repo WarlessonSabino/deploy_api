@@ -225,85 +225,91 @@
         }
 
         function updateSelected() {
-            const selectedContainer = document.getElementById('selectedOrcamentos');
-            const totalsContainer = document.getElementById('totals');
+    const selectedContainer = document.getElementById('selectedOrcamentos');
+    const totalsContainer = document.getElementById('totals');
 
+    selectedContainer.innerHTML = '';
+    let totalBruto = 0;
+    let totalDesconto = 0;
+    let totalGeral = 0;
+    let copiedText = '';
 
-            selectedContainer.innerHTML = '';
-            let totalBruto = 0;
-            let totalDesconto = 0;
-            let totalGeral = 0;
-            let copiedText = '';
-
-
-            const introMessage = `
+    const introMessage = `
 ✨ Obrigado por escolher nossa farmácia de manipulação! ✨
 
 Seu orçamento foi concluído com sucesso e está prontinho para atender suas necessidades com qualidade e cuidado. Confira os detalhes abaixo:
 
 `;
-            const conclusionMessage = `
+    const conclusionMessage = `
 💡 Próximos Passos:
 👉 Assim que aprovado, nossa equipe começa imediatamente a manipular sua fórmula com todo o cuidado que você merece. Qualquer dúvida, estamos prontos para ajudar!
 
 Conte conosco para sua saúde e bem-estar!
 
+Você pode realizar o pagamento através do link: {{link}}
+
 💚 Pharmes, sempre ao seu lado.
 `;
 
-            copiedText += introMessage;
+    copiedText += introMessage;
+
+    document.querySelectorAll('.orcamento-checkbox:checked').forEach(checkbox => {
+        const bruto = parseFloat(checkbox.getAttribute('data-bruto'));
+        const desconto = parseFloat(checkbox.getAttribute('data-desconto'));
+        const componentes = checkbox.getAttribute('data-componentes') || '';
+        const formaFarmaceutica = checkbox.getAttribute('data-formafarmaceutica') || '';
+        const quantidade = checkbox.getAttribute('data-quantidade') || '';
+
+        const componentesArray = componentes.split(',');
+        const componentesHtml = componentesArray
+            .map(item => item.trim())
+            .join('<br>');
+        const componentesText = componentesArray
+            .map(item => item.trim())
+            .join('\n');
+
+        totalBruto += bruto;
+        totalDesconto += desconto;
+        totalGeral += (bruto - desconto);
+
+        const formattedBruto = formatter.format(bruto);
+        const formattedDesconto = formatter.format(desconto);
+        const formattedGeral = formatter.format(bruto - desconto);
+
+        const message = document.createElement('div');
+        message.classList.add('message');
 
 
-            document.querySelectorAll('.orcamento-checkbox:checked').forEach(checkbox => {
+        if (desconto > 0) {
+            message.innerHTML = `
+                <strong>📝 Orçamento N:</strong> ${checkbox.parentNode.textContent.trim()}<br><br>
 
-                const bruto = parseFloat(checkbox.getAttribute('data-bruto'));
-                const desconto = parseFloat(checkbox.getAttribute('data-desconto'));
+                <strong>Fórmula Farmacêutica:</strong> ${formaFarmaceutica}<br>
+                <strong>Quantidade:</strong> ${quantidade}<br><br>
 
+                <strong>📦 Fórmula Manipulada:</strong><br><br> 
+                ${componentesHtml}<br><br>
 
-                const componentes = checkbox.getAttribute('data-componentes') || '';
-                const formaFarmaceutica = checkbox.getAttribute('data-formafarmaceutica') || '';
-                const quantidade = checkbox.getAttribute('data-quantidade') || '';
+                <strong>Bruto:</strong> R$ ${formattedBruto} 
+                | <strong>Desconto:</strong> R$ ${formattedDesconto} 
+                | <strong>Geral:</strong> R$ ${formattedGeral}<br>
+            `;
+        } else {
+            message.innerHTML = `
+                <strong>📝 Orçamento N:</strong> ${checkbox.parentNode.textContent.trim()}<br><br>
 
+                <strong>Fórmula Farmacêutica:</strong> ${formaFarmaceutica}<br>
+                <strong>Quantidade:</strong> ${quantidade}<br><br>
 
+                <strong>📦 Fórmula Manipulada:</strong><br><br> 
+                ${componentesHtml}<br><br>
 
-                const componentesArray = componentes.split(',');
-                const componentesHtml = componentesArray
-                    .map(item => item.trim())
-                    .join('<br>');
-                const componentesText = componentesArray
-                    .map(item => item.trim())
-                    .join('\n');
+                <strong>Geral:</strong> R$ ${formattedGeral}<br>
+            `;
+        }
+        selectedContainer.appendChild(message);
 
-
-                totalBruto += bruto;
-                totalDesconto += desconto;
-                totalGeral += (bruto - desconto);
-
-
-                const formattedBruto = formatter.format(bruto);
-                const formattedDesconto = formatter.format(desconto);
-                const formattedGeral = formatter.format(bruto - desconto);
-
-
-                const message = document.createElement('div');
-                message.classList.add('message');
-                message.innerHTML = `
-                    <strong>📝 Orçamento N:</strong> ${checkbox.parentNode.textContent.trim()}<br><br>
-
-                    <strong>Fórmula Farmacêutica:</strong> ${formaFarmaceutica}<br>
-                    <strong>Quantidade:</strong> ${quantidade}<br><br>
-
-                    <strong>📦 Fórmula Manipulada:</strong><br><br> 
-                    ${componentesHtml}<br><br>
-
-                    <strong>Bruto:</strong> R$ ${formattedBruto} 
-                    | <strong>Desconto:</strong> R$ ${formattedDesconto} 
-                    | <strong>Geral:</strong> R$ ${formattedGeral}<br>
-                `;
-                selectedContainer.appendChild(message);
-
-
-                copiedText += `
+        copiedText += `
 📝 Orçamento N: ${checkbox.parentNode.textContent.trim()}
 
 Fórmula Farmacêutica: ${formaFarmaceutica}
@@ -312,55 +318,52 @@ Quantidade: ${quantidade}
 📦 Fórmula Manipulada:
 ${componentesText}
 
-Bruto: R$ ${formattedBruto} | Desconto: R$ ${formattedDesconto} | Geral: R$ ${formattedGeral}
+${desconto > 0 ? `Bruto: R$ ${formattedBruto} | Desconto: R$ ${formattedDesconto} | Geral: R$ ${formattedGeral}` : `Geral: R$ ${formattedGeral}`}
 
 `;
-            });
+    });
 
-
-            copiedText += `
+    copiedText += `
 Totais Consolidados:
 💰 Total Bruto: R$ ${formatter.format(totalBruto)}
 🎉 Total Desconto: R$ ${formatter.format(totalDesconto)}
 💲 Total Geral: R$ ${formatter.format(totalGeral)}
 
 `;
-            copiedText += conclusionMessage;
+    copiedText += conclusionMessage;
 
+    totalsContainer.innerHTML = `
+        <div>💰 Total Bruto: <span>R$ ${formatter.format(totalBruto)}</span></div>
+        <div>🎉 Total Desconto: <span>R$ ${formatter.format(totalDesconto)}</span></div>
+        <div>💲 Total Geral: <span>R$ ${formatter.format(totalGeral)}</span></div>
+    `;
 
-            totalsContainer.innerHTML = `
-                <div>💰 Total Bruto: <span>R$ ${formatter.format(totalBruto)}</span></div>
-                <div>🎉 Total Desconto: <span>R$ ${formatter.format(totalDesconto)}</span></div>
-                <div>💲 Total Geral: <span>R$ ${formatter.format(totalGeral)}</span></div>
-            `;
-
-
-            document.getElementById('copyButton').onclick = () => {
-
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(copiedText).then(() => {
-                        alert('Orçamentos copiados com sucesso!');
-                    }).catch(err => {
-                        console.error('Erro ao copiar para a área de transferência:', err);
-                        alert('Não foi possível copiar os orçamentos automaticamente. Tente copiar manualmente.');
-                    });
-                } else {
-
-                    const textarea = document.createElement('textarea');
-                    textarea.value = copiedText;
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    try {
-                        document.execCommand('copy');
-                        alert('Orçamentos copiados com sucesso!');
-                    } catch (err) {
-                        console.error('Erro ao copiar usando execCommand:', err);
-                        alert('Não foi possível copiar os orçamentos automaticamente. Tente copiar manualmente.');
-                    }
-                    document.body.removeChild(textarea);
-                }
-            };
+    document.getElementById('copyButton').onclick = () => {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(copiedText).then(() => {
+                alert('Orçamentos copiados com sucesso!');
+            }).catch(err => {
+                console.error('Erro ao copiar para a área de transferência:', err);
+                alert('Não foi possível copiar os orçamentos automaticamente. Tente copiar manualmente.');
+            });
+        } else {
+            const textarea = document.createElement('textarea');
+            textarea.value = copiedText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                alert('Orçamentos copiados com sucesso!');
+            } catch (err) {
+                console.error('Erro ao copiar usando execCommand:', err);
+                alert('Não foi possível copiar os orçamentos automaticamente. Tente copiar manualmente.');
+            }
+            document.body.removeChild(textarea);
         }
+    };
+}
+
     </script>
 </body>
 </html>
+
