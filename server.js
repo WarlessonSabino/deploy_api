@@ -56,12 +56,23 @@ app.get('/requisicoes', (req, res) => {
 
             CASE fc15100.tpformafarma
 
-                WHEN 1 THEN  (ROUND(fc15100.volume,0) || ' ' || 'Cápsulas' || ' ' || ' tomar ' || ' ' || ROUND(fc15100.qtcont,0) || ' ' || 'por dia.')
+                WHEN 1 THEN  (ROUND(fc15100.volume,0) || ' ' || 'doses' || ' ' || ' (1 dose = ' || ' ' || ROUND(fc15100.qtcont,0) || ' ' || 'Cápsulas).')
                 ELSE ( ROUND(fc15100.volume,0) || ' ' || fc15100.univol)
-                
+
             END AS "Quantidade",
 
-                CAST(LEFT(LIST(fc15110.DESCR || ' ' || REPLACE(CAST(ROUND(fc15110.quant, 0) AS VARCHAR(255)), '.', ',') || ' ' || LOWER(fc15110.unida)), 255) AS VARCHAR(255)) AS "Componentes da Fórmula"
+            CAST(
+            LIST(
+                fc03000.descrprd
+                || ' ' 
+                || REPLACE(CAST(ROUND(fc15110.quant, 0) AS VARCHAR(32704)), '.', ',') 
+                || ' ' 
+                || LOWER(fc15110.unida)
+                )
+                AS VARCHAR(32704)
+            ) AS "Componentes da Fórmula"
+
+
 
             FROM
                 fc15100
@@ -73,6 +84,9 @@ app.get('/requisicoes', (req, res) => {
             LEFT JOIN
             fc12004 on fc12004.codigo = fc15100.tpformafarma
 
+            LEFT JOIN
+            fc03000 on fc03000.cdpro = fc15110.cdprin
+
 
             WHERE
                 fc15100.nrorc = ? 
@@ -81,6 +95,7 @@ app.get('/requisicoes', (req, res) => {
 
             AND 
                 fc15110.tpcmp = 'C'  
+
             AND 
                 fc15110.unida <> '%A'    
 
