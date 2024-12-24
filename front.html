@@ -169,7 +169,7 @@
 
             try {
               
-                const response = await fetch(`http://3.19.234.123:3000/requisicoes?nrorc=${nrorc}&cdfil=${cdfil}`);
+                const response = await fetch(`http://3.19.234.123/:3000/requisicoes?nrorc=${nrorc}&cdfil=${cdfil}`);
                 if (!response.ok) {
                     throw new Error('Erro ao buscar os dados');
                 }
@@ -224,7 +224,7 @@
             });
         }
 
-        function updateSelected() {
+    function updateSelected() {
     const selectedContainer = document.getElementById('selectedOrcamentos');
     const totalsContainer = document.getElementById('totals');
 
@@ -366,4 +366,3 @@ Totais Consolidados:
     </script>
 </body>
 </html>
-
