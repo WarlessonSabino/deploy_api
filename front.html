@@ -308,7 +308,7 @@ Conte conosco para sua saúde e bem-estar!
         selectedContainer.appendChild(message);
 
         copiedText += `
-📝 ORC: ${checkbox.parentNode.textContent.trim()}
+📝 ORC: ${checkbox.parentNode.textContent.trim().replace(/\s+/g, '')}
 
 Fórmula Farmacêutica: ${formaFarmaceutica}
 Quantidade: ${quantidade}
@@ -321,13 +321,22 @@ ${desconto > 0 ? `Sub-Total: R$ ${formattedBruto} | Total de Descontos: R$ ${for
 `;
     });
 
-    copiedText += `
+
+    if (totalDesconto > 0) {
+        copiedText += `
 Totais Consolidados:
-💰 Sub-Total: R$ ${formatter.format(totalBruto)}
-🎉 Total de Descontos: R$ ${formatter.format(totalDesconto)}
-💲  Total: R$ ${formatter.format(totalGeral)}
+💰 SUB-TOTAL: R$ ${formatter.format(totalBruto)}
+🎉 TOTAL DE DESCONTOS: R$ ${formatter.format(totalDesconto)}
+💲 TOTAL: R$ ${formatter.format(totalGeral)}
 
 `;
+    } else {
+        copiedText += `
+Totais Consolidados:
+💲 TOTAL: R$ ${formatter.format(totalGeral)}
+
+`;
+    }
     copiedText += conclusionMessage;
 
     totalsContainer.innerHTML = `
