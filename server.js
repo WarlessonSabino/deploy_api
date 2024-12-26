@@ -63,7 +63,10 @@ app.get('/requisicoes', (req, res) => {
 
             CAST(
             LIST(
-                fc03000.descrprd
+                CASE
+                WHEN fc03000.descrprd <> fc15110.descr THEN fc15110.descr
+                ELSE fc03000.descrprd
+                END
                 || ' ' 
                 || REPLACE(CAST(ROUND(fc15110.quant, 0) AS VARCHAR(32704)), '.', ',') 
                 || ' ' 
