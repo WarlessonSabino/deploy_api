@@ -310,24 +310,24 @@ Você pode realizar o pagamento através do link: {{link}}
         selectedContainer.appendChild(message);
 
         copiedText += `
-📝 Orçamento N: ${checkbox.parentNode.textContent.trim()}
+📝 ORC: ${checkbox.parentNode.textContent.trim()}
 
 Fórmula Farmacêutica: ${formaFarmaceutica}
 Quantidade: ${quantidade}
 
-📦 Fórmula Manipulada:
+Fórmula Manipulada:
 ${componentesText}
 
-${desconto > 0 ? `Bruto: R$ ${formattedBruto} | Desconto: R$ ${formattedDesconto} | Geral: R$ ${formattedGeral}` : `Geral: R$ ${formattedGeral}`}
+${desconto > 0 ? `Sub-Total: R$ ${formattedBruto} | Total de Descontos: R$ ${formattedDesconto} | Total: R$ ${formattedGeral}` : `Total: R$ ${formattedGeral}`}
 
 `;
     });
 
     copiedText += `
 Totais Consolidados:
-💰 Total Bruto: R$ ${formatter.format(totalBruto)}
-🎉 Total Desconto: R$ ${formatter.format(totalDesconto)}
-💲 Total Geral: R$ ${formatter.format(totalGeral)}
+💰 Sub-Total: R$ ${formatter.format(totalBruto)}
+🎉 Total de Descontos: R$ ${formatter.format(totalDesconto)}
+💲 Total: R$ ${formatter.format(totalGeral)}
 
 `;
     copiedText += conclusionMessage;
