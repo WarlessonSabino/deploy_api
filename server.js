@@ -68,7 +68,7 @@ app.get('/requisicoes', (req, res) => {
                 ELSE fc03000.descrprd
                 END
                 || ' ' 
-                || REPLACE(CAST(ROUND(fc15110.quant, 0) AS VARCHAR(32704)), '.', ',') 
+                || REPLACE(CAST(ROUND(fc15110.quant, 2) AS VARCHAR(32704)), '.', ',') 
                 || ' ' 
                 || LOWER(fc15110.unida)
                 )
