@@ -85,7 +85,7 @@ app.get('/requisicoes', (req, res) => {
                                 fc15110.quant,
                                 CASE
                                     WHEN fc15110.quant LIKE '0%' THEN 2
-                                    ELSE 0
+                                    ELSE 1
                                 END
                             ) AS VARCHAR(255)
                     )
