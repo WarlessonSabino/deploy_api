@@ -55,25 +55,46 @@ app.get('/requisicoes', (req, res) => {
 
 
             CASE fc15100.tpformafarma
-
-                WHEN 1 THEN  (ROUND(fc15100.volume,0) || ' ' || 'doses' || ' ' || ' (1 dose = ' || ' ' || ROUND(fc15100.qtcont,0) || ' ' || 'Cápsulas).')
-                ELSE ( ROUND(fc15100.volume,2) || ' ' || fc15100.univol)
-
+                WHEN 1 THEN 
+                    (ROUND(fc15100.volume, 
+                        CASE 
+                            WHEN fc15100.volume LIKE '0%' THEN 2 
+                            ELSE 0 
+                        END) 
+                    || ' ' || 'doses' || ' ' || 
+                    '(1 dose = ' || ' ' || ROUND(fc15100.qtcont, 0) || ' ' || 'Cápsulas).')
+                ELSE 
+                    (ROUND(fc15100.volume, 
+                        CASE 
+                            WHEN fc15100.volume LIKE '0%' THEN 2 
+                            ELSE 0 
+                        END) 
+                    || ' ' || fc15100.univol)
             END AS "Quantidade",
 
+
             CAST(
-            LIST(
-                CASE
-                WHEN fc03000.descrprd <> fc15110.descr THEN fc15110.descr
-                ELSE fc03000.descrprd
-                END
-                || ' ' 
-                || REPLACE(CAST(ROUND(fc15110.quant, 2) AS VARCHAR(32704)), '.', ',') 
-                || ' ' 
-                || LOWER(fc15110.unida)
-                )
-                AS VARCHAR(32704)
+                LIST(
+                    CASE
+                        WHEN fc03000.descrprd <> fc15110.descr THEN fc15110.descr
+                        ELSE fc03000.descrprd
+                    END
+                    || ' ' 
+                    || CAST(
+                            ROUND(
+                                fc15110.quant,
+                                CASE
+                                    WHEN fc15110.quant LIKE '0%' THEN 2
+                                    ELSE 0
+                                END
+                            ) AS VARCHAR(255)
+                    )
+                    || ' ' 
+                    || LOWER(fc15110.unida)
+                ) AS VARCHAR(32704)
             ) AS "Componentes da Fórmula"
+
+
 
 
 
@@ -92,7 +113,7 @@ app.get('/requisicoes', (req, res) => {
 
 
             WHERE
-                fc15100.nrorc = ? 
+                fc15100.nrorc = ?
             AND
                 fc15100.cdfil = ?
 
