@@ -97,7 +97,7 @@ app.get('/requisicoes', (req, res) => {
                 fc15100.cdfil = ?
 
             AND 
-                fc15110.tpcmp = 'C'  
+                fc15110.tpcmp IN ('C','H')  
 
             AND 
                 fc15110.unida <> '%A'    
