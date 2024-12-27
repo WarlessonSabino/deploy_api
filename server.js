@@ -57,7 +57,7 @@ app.get('/requisicoes', (req, res) => {
             CASE fc15100.tpformafarma
 
                 WHEN 1 THEN  (ROUND(fc15100.volume,0) || ' ' || 'doses' || ' ' || ' (1 dose = ' || ' ' || ROUND(fc15100.qtcont,0) || ' ' || 'Cápsulas).')
-                ELSE ( ROUND(fc15100.volume,0) || ' ' || fc15100.univol)
+                ELSE ( ROUND(fc15100.volume,2) || ' ' || fc15100.univol)
 
             END AS "Quantidade",
 
