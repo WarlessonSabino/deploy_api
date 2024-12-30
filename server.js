@@ -71,16 +71,22 @@ app.get('/requisicoes', (req, res) => {
                         WHEN fc03000.descrprd <> fc15110.descr THEN fc15110.descr
                         ELSE fc03000.descrprd
                     END
-                    || ' ' 
-                    || CAST(
-                            ROUND(
-                                fc15110.quant, 2
-                            ) AS VARCHAR(255)
+                    || ' '
+                    || ROUND(
+                        CASE 
+                            WHEN fc15110.quant = 0 THEN fc15110.quanthp 
+                            ELSE fc15110.quant
+                        END, 2
                     )
-                    || ' ' 
-                    || LOWER(fc15110.unida)
+                    || ' '
+                    || CASE
+                        WHEN fc15110.unida IS NULL THEN ' ' || LOWER(fc15110.unidaprd)
+                        ELSE ' ' || LOWER(fc15110.unida) 
+                    END
                 ) AS VARCHAR(32704)
             ) AS "Componentes da Fórmula"
+
+
 
 
 
@@ -106,7 +112,7 @@ app.get('/requisicoes', (req, res) => {
                 fc15110.tpcmp IN ('C','H')  
 
             AND 
-                fc15110.unida <> '%A'    
+                fc15110.indelicmp <> 'S'      
 
 
             GROUP BY 
