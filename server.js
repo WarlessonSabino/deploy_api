@@ -21,7 +21,7 @@ app.get('/requisicoes', (req, res) => {
         }
 
         const sqlQuery = `
-                SELECT          
+            SELECT          
                 fc15100.cdfil || ' - ' || fc15100.nrorc || ' - ' || fc15100.serieo as "N° Orçamento",
                 fc15100.prcobr AS "Valor_Bruto",
                 fc15100.vrdsc AS "Valor_Desconto",
@@ -56,11 +56,19 @@ app.get('/requisicoes', (req, res) => {
 
             CASE fc15100.tpformafarma
                 WHEN 1 THEN 
-                    (ROUND(fc15100.volume, 2 ) 
+                    (ROUND(fc15100.volume, 
+                        CASE 
+                            WHEN fc15100.volume LIKE '0%' THEN 2 
+                            ELSE 1 
+                        END) 
                     || ' ' || 'doses' || ' ' || 
                     '(1 dose = ' || ' ' || ROUND(fc15100.qtcont, 0) || ' ' || 'Cápsulas).')
                 ELSE 
-                    (ROUND(fc15100.volume, 2 ) 
+                    (ROUND(fc15100.volume, 
+                        CASE 
+                            WHEN fc15100.volume LIKE '0%' THEN 2 
+                            ELSE 1 
+                        END) 
                     || ' ' || fc15100.univol)
             END AS "Quantidade",
 
@@ -74,7 +82,11 @@ app.get('/requisicoes', (req, res) => {
                     || ' ' 
                     || CAST(
                             ROUND(
-                                fc15110.quant, 2
+                                fc15110.quant,
+                                CASE
+                                    WHEN fc15110.quant LIKE '0%' THEN 2
+                                    ELSE 1
+                                END
                             ) AS VARCHAR(255)
                     )
                     || ' ' 
@@ -83,12 +95,18 @@ app.get('/requisicoes', (req, res) => {
             ) AS "Componentes da Fórmula"
 
 
+
+
+
             FROM
                 fc15100
 
 
             LEFT JOIN
             fc15110 on fc15110.nrorc = fc15100.nrorc AND fc15110.cdfil = fc15100.cdfil and fc15110.serieo = fc15100.serieo
+
+            LEFT JOIN
+            fc12004 on fc12004.codigo = fc15100.tpformafarma
 
             LEFT JOIN
             fc03000 on fc03000.cdpro = fc15110.cdprin
@@ -113,9 +131,9 @@ app.get('/requisicoes', (req, res) => {
             fc15100.volume,
             fc15100.qtcont,
             fc15100.tpformafarma,
-            fc15100.univol;
-
-            `;
+            fc15100.univol,
+            fc12004.forma_farmaceutica 
+        `;
 
         db.query(sqlQuery, [nrorc, cdfil], (err, result) => {
             db.detach();
