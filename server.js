@@ -21,7 +21,7 @@ app.get('/requisicoes', (req, res) => {
         }
 
         const sqlQuery = `
-                        SELECT          
+                SELECT          
                 fc15100.cdfil || ' - ' || fc15100.nrorc || ' - ' || fc15100.serieo as "N° Orçamento",
                 fc15100.prcobr AS "Valor_Bruto",
                 fc15100.vrdsc AS "Valor_Desconto",
@@ -83,9 +83,6 @@ app.get('/requisicoes', (req, res) => {
             ) AS "Componentes da Fórmula"
 
 
-
-
-
             FROM
                 fc15100
 
@@ -117,6 +114,8 @@ app.get('/requisicoes', (req, res) => {
             fc15100.qtcont,
             fc15100.tpformafarma,
             fc15100.univol;
+
+            `;
 
         db.query(sqlQuery, [nrorc, cdfil], (err, result) => {
             db.detach();
