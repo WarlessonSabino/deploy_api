@@ -59,7 +59,7 @@ app.get('/requisicoes', (req, res) => {
                     (ROUND(fc15100.volume, 
                         CASE 
                             WHEN fc15100.volume LIKE '0%' THEN 2 
-                            ELSE 1 
+                            ELSE 2 
                         END) 
                     || ' ' || 'doses' || ' ' || 
                     '(1 dose = ' || ' ' || ROUND(fc15100.qtcont, 0) || ' ' || 'Cápsulas).')
@@ -67,7 +67,7 @@ app.get('/requisicoes', (req, res) => {
                     (ROUND(fc15100.volume, 
                         CASE 
                             WHEN fc15100.volume LIKE '0%' THEN 2 
-                            ELSE 1 
+                            ELSE 2 
                         END) 
                     || ' ' || fc15100.univol)
             END AS "Quantidade",
