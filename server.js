@@ -21,7 +21,7 @@ app.get('/requisicoes', (req, res) => {
         }
 
         const sqlQuery = `
-                        SELECT          
+            SELECT          
                 fc15100.cdfil || ' - ' || fc15100.nrorc || ' - ' || fc15100.serieo as "N° Orçamento",
                 fc15100.prcobr AS "Valor_Bruto",
                 fc15100.vrdsc AS "Valor_Desconto",
@@ -65,28 +65,22 @@ app.get('/requisicoes', (req, res) => {
             END AS "Quantidade",
 
 
-            CAST(
-                LIST(
-                    CASE
-                        WHEN fc03000.descrprd <> fc15110.descr THEN fc15110.descr
-                        ELSE fc03000.descrprd
-                    END
-                    || ' '
-                    || ROUND(
+            CASE
+                WHEN fc03000.descrprd <> fc15110.descr THEN fc15110.descr
+                ELSE fc03000.descrprd
+            END AS "Componentes da Fórmula",
+
+            ROUND(
                         CASE 
                             WHEN fc15110.quant = 0 THEN fc15110.quanthp 
                             ELSE fc15110.quant
                         END, 2
-                    )
-                    || ' '
-                    || CASE
+                    )|| ' ' ||
+                     CASE
                         WHEN fc15110.unida IS NULL THEN ' ' || LOWER(fc15110.unidaprd)
                         ELSE ' ' || LOWER(fc15110.unida) 
                     END
-                ) AS VARCHAR(32704)
-            ) AS "Componentes da Fórmula"
-
-
+                AS "Quantidade Dosagem"
 
 
 
@@ -122,7 +116,14 @@ app.get('/requisicoes', (req, res) => {
             fc15100.volume,
             fc15100.qtcont,
             fc15100.tpformafarma,
-            fc15100.univol
+            fc15100.univol,
+            fc15110.quant,
+            fc15110.quanthp, 
+            fc03000.descrprd,
+            fc15110.descr,
+            fc15110.descr,
+            fc15110.unida, 
+            fc15110.unidaprd
 
         `;
 
