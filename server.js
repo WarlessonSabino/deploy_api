@@ -82,6 +82,10 @@ app.get('/requisicoes', (req, res) => {
                     END
                 AS "Quantidade Dosagem"
 
+
+
+
+
             FROM
                 fc15100
 
@@ -142,3 +146,4 @@ app.get('/requisicoes', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
