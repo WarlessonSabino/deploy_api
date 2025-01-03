@@ -335,16 +335,30 @@ Totais Consolidados:
         `;
 
         document.getElementById('copyButton').onclick = () => {
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(copiedText).then(() => {
-                    alert('Orçamentos copiados com sucesso!');
-                }).catch(err => {
-                    console.error('Erro ao copiar para a área de transferência:', err);
-                    alert('Não foi possível copiar os orçamentos automaticamente. Tente copiar manualmente.');
-                });
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(copiedText).then(() => {
+                alert('Orçamentos copiados com sucesso!');
+            }).catch(err => {
+                console.error('Erro ao copiar para a área de transferência:', err);
+                alert('Não foi possível copiar os orçamentos automaticamente. Tente copiar manualmente.');
+            });
+        } else {
+            const textarea = document.createElement('textarea');
+            textarea.value = copiedText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                alert('Orçamentos copiados com sucesso!');
+            } catch (err) {
+                console.error('Erro ao copiar usando execCommand:', err);
+                alert('Não foi possível copiar os orçamentos automaticamente. Tente copiar manualmente.');
             }
-        };
-    }
+            document.body.removeChild(textarea);
+        }
+    };
+}
+
 </script>
 </body>
 </html>
