@@ -82,10 +82,6 @@ app.get('/requisicoes', (req, res) => {
                     END
                 AS "Quantidade Dosagem"
 
-
-
-
-
             FROM
                 fc15100
 
