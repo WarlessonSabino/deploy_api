@@ -262,6 +262,7 @@ Conte conosco para sua saúde e bem-estar!
         document.querySelectorAll('.orcamento-checkbox:checked').forEach(checkbox => {
             const numero = checkbox.getAttribute('data-numero');
             const detalhes = JSON.parse(checkbox.getAttribute('data-detalhes'));
+            const formattedNumero = numero.replace(/\s+/g, ''); 
 
             // Consolidar os componentes
             const componentesArray = detalhes.map(item => 
@@ -297,7 +298,7 @@ Conte conosco para sua saúde e bem-estar!
             selectedContainer.appendChild(message);
 
             copiedText += `
-📝 ORC: ${numero}
+📝 ORC:${formattedNumero}
 
 Fórmula Farmacêutica: ${item['Fórmula Farmacêutica']}
 Quantidade: ${item['Quantidade']}
