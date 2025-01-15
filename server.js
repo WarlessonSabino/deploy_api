@@ -77,7 +77,7 @@ app.get('/requisicoes', (req, res) => {
                         END, 2
                     )|| ' ' ||
                      CASE
-                        WHEN fc15110.unida IS NULL THEN ' ' || LOWER(fc15110.unidaprd)
+                        WHEN fc15110.unida IS NULL THEN ' ' || LOWER(fc15110.unihp)
                         ELSE ' ' || LOWER(fc15110.unida) 
                     END
                 AS "Quantidade Dosagem"
@@ -123,6 +123,7 @@ app.get('/requisicoes', (req, res) => {
             fc15110.descr,
             fc15110.descr,
             fc15110.unida, 
+            fc15110.unihp, 
             fc15110.unidaprd
 
         `;
