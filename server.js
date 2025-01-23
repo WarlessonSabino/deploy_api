@@ -67,6 +67,7 @@ app.get('/requisicoes', (req, res) => {
 
             CASE
                 WHEN fc03000.descrprd <> fc15110.descr THEN fc15110.descr
+                WHEN fc03000.descrprd is null THEN fc15110.descr
                 ELSE fc03000.descrprd
             END AS "Componentes da Fórmula",
 
