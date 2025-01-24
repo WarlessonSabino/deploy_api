@@ -245,16 +245,16 @@
         const introMessage = `
 ✨ Obrigado por escolher nossa farmácia de manipulação! ✨
 
-Seu orçamento foi concluído com sucesso e está prontinho para atender suas necessidades com qualidade e cuidado. Confira os detalhes abaixo:
+Fiz seu orçamento com todo cuidado e atenção que você merece!
 
 `;
         const conclusionMessage = `
-💡 Próximos Passos:
-👉 Assim que aprovado, nossa equipe começa imediatamente a manipular sua fórmula com todo o cuidado que você merece. Qualquer dúvida, estamos prontos para ajudar!
+Assim que aprovado, nossa equipe começa imediatamente a manipular sua fórmula com todo o cuidado que você merece.
+
+Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e bem-estar! 
 
 Conte conosco para sua saúde e bem-estar!
 
-💚 Pharmes, sempre ao seu lado.
 `;
 
         copiedText += introMessage;
@@ -298,10 +298,8 @@ Conte conosco para sua saúde e bem-estar!
             selectedContainer.appendChild(message);
 
             copiedText += `
-📝 ORC:${formattedNumero}
+📝 ORC:${formattedNumero} Quantidade: ${item['Quantidade']}
 
-Fórmula Farmacêutica: ${item['Fórmula Farmacêutica']}
-Quantidade: ${item['Quantidade']}
 
 Fórmula Manipulada:
 ${componentesText}
