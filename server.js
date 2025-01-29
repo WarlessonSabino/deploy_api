@@ -21,7 +21,7 @@ app.get('/requisicoes', (req, res) => {
         }
 
         const sqlQuery = `
-            SELECT          
+                        SELECT          
                 fc15100.cdfil || ' - ' || fc15100.nrorc || ' - ' || fc15100.serieo as "N° Orçamento",
                 fc15100.prcobr AS "Valor_Bruto",
                 fc15100.vrdsc AS "Valor_Desconto",
@@ -59,6 +59,8 @@ app.get('/requisicoes', (req, res) => {
                     (ROUND(fc15100.volume, 2)
                     || ' ' || 'doses' || ' ' || 
                     '(1 dose = ' || ' ' || ROUND(fc15100.qtcont, 0) || ' ' || 'Cápsulas).')
+                WHEN fc15100.tpformafarma THEN
+                     fc15100.qtfor
                 ELSE 
                     (ROUND(fc15100.volume, 2 )
                     || ' ' || fc15100.univol)
@@ -74,6 +76,7 @@ app.get('/requisicoes', (req, res) => {
             ROUND(
                         CASE 
                             WHEN fc15110.quant = 0 THEN fc15110.quanthp 
+                            WHEN fc15100.tpformafarma = 6 THEN fc15100.qtfor
                             ELSE fc15110.quant
                         END, 2
                     )|| ' ' ||
@@ -81,7 +84,12 @@ app.get('/requisicoes', (req, res) => {
                         WHEN fc15110.unida IS NULL THEN ' ' || LOWER(fc15110.unihp)
                         ELSE ' ' || LOWER(fc15110.unida) 
                     END
-                AS "Quantidade Dosagem"
+                AS "Quantidade Dosagem",
+
+            CASE fc15100.qtaprov
+                    WHEN 0 THEN '⬜'
+            ELSE '✅'
+            END AS "Status"
 
 
 
@@ -125,8 +133,9 @@ app.get('/requisicoes', (req, res) => {
             fc15110.descr,
             fc15110.unida, 
             fc15110.unihp, 
-            fc15110.unidaprd
-
+            fc15110.unidaprd,
+            fc15100.qtfor,
+            fc15100.qtaprov;
         `;
 
         db.query(sqlQuery, [nrorc, cdfil], (err, result) => {
