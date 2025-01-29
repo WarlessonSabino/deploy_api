@@ -187,29 +187,34 @@
         }
     });
 
-    function renderResults(data) {
+        function renderResults(data) {
         const optionsContainer = document.getElementById('options');
         optionsContainer.innerHTML = '';
 
         // Agrupar orçamentos únicos
         const groupedData = data.reduce((acc, item) => {
             const numero = item['N° Orçamento'];
+            const status = item['Status']; // Obtendo o status
+
             if (!acc[numero]) {
-                acc[numero] = [];
+                acc[numero] = { status, detalhes: [] };
             }
-            acc[numero].push(item);
+            acc[numero].detalhes.push(item);
             return acc;
         }, {});
 
-        // Renderizar números únicos
+        // Renderizar números únicos com status
         Object.keys(groupedData).forEach(numero => {
+            const { status, detalhes } = groupedData[numero];
+
             const option = document.createElement('div');
             option.innerHTML = `
                 <label>
                     <input type="checkbox" class="orcamento-checkbox" 
                         data-numero="${numero}" 
-                        data-detalhes='${JSON.stringify(groupedData[numero])}'>
-                    ${numero}
+                        data-status="${status}"
+                        data-detalhes='${JSON.stringify(detalhes)}'>
+                    ${numero}  ${status} 
                 </label>
             `;
             optionsContainer.appendChild(option);
@@ -231,6 +236,7 @@
             checkbox.addEventListener('change', updateSelected);
         });
     }
+
 
     function updateSelected() {
         const selectedContainer = document.getElementById('selectedOrcamentos');
