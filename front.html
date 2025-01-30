@@ -498,7 +498,7 @@ Totais Consolidados:
         const valototal = precoCalculado * multiplicadorMes;
 
         // Cálculo do desconto aplicado
-        const descontoAplicado = (totalGeral * multiplicadorMes) - precoCalculado;
+        const descontoAplicado = (totalGeral * multiplicadorMes) - precoCalculado * multiplicadorMes;
 
         // Exibir os resultados na calculadora
         document.getElementById('calculationResult').innerHTML = `
