@@ -100,76 +100,84 @@
         }
         #copyButton:hover {
             background: #218838;
+
         }
+
+        /* Estilos do widget da calculadora */
         #calculator {
             position: fixed;
             bottom: 20px;
             right: 20px;
             background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 10px;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            max-width: 300px;
-            transition: height 0.3s ease, opacity 0.3s ease;
-            opacity: 0.9;
-            overflow: hidden;
-            height: 50px; /* Altura do widget quando colapsado */
-        }
-        #calculator.expanded {
-            height: 450px; /* Altura do widget quando expandido */
-        }
-        #calculator h3 {
-            margin: 0 0 10px;
-            font-size: 18px;
-            color: #007bff;
-            text-align: center;
-        }
-        #calculator .form-group {
-            margin-bottom: 10px;
-        }
-        #calculationResult {
-            margin-top: 10px;
-            font-weight: bold;
-            text-align: center;
-            color: #28a745;
-        }
-        #toggleCalculator {
             cursor: pointer;
-            text-align: center;
-            padding: 14px;
-            background: #007bff;
-            color: white;
-            border-radius: 4px;
-            margin-bottom: 10px;
+            transition: width 0.3s ease, height 0.3s ease, border-radius 0.3s ease;
+            overflow: hidden;
         }
-        #toggleCalculator:hover {
-            background: #0056b3;
+
+        #calculator img {
+            width: 30px;
+            height: 30px;
         }
+
+        #calculator.expanded {
+            width: 300px;
+            height: 450px;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: start;
+            cursor: default;
+        }
+
+        #calculator.expanded img {
+            display: none; /* Esconde o ícone ao expandir */
+        }
+
         .calculator-content {
             display: none;
-            padding: 10px;
+            width: 100%;
         }
-        .calculator-content.active {
+
+        #calculator.expanded .calculator-content {
             display: block;
         }
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            button {
-                font-size: 14px;
-            }
-            .totals {
-                font-size: 16px;
-            }
+
+        /* Botão de fechar a calculadora */
+        #closeCalculator {
+        position: absolute;
+        top: 10px; /* Ajusta a posição vertical */
+        left: 150px; /* Ajusta a posição horizontal */
+        background: none; /* Remove o fundo azul */
+        color: #007bff; /* Cor do "X" */
+        border: none; /* Remove borda */
+        font-size: 16px; /* Tamanho da fonte do "X" */
+        font-weight: bold; /* Peso do "X" */
+        cursor: pointer; /* Cursor em formato de mão */
+        line-height: normal; /* Remove inconsistências de altura de linha */
+        padding: 0; /* Remove espaço interno */
+    }
+
+
+
+        #calculator.expanded #closeCalculator {
+            display: block;
         }
+
+
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Pharmes - Consulta de Orçamentos</h1>
+        <h1>Pharmes - Consulta Orçamentos</h1>
         <div class="form-group">
             <label for="cdfil">Filial</label>
             <input type="text" id="cdfil" placeholder="Digite o código da filial">
@@ -202,28 +210,32 @@
     </div>
 
     <div id="calculator">
-        <div id="toggleCalculator">Calculadora</div> 
-            <h3>Calculadora de Preço</h3>
-            <div class="form-group">
-                <label for="currentTreatment">Tempo de Tratamento Atual:</label>
-                <select id="currentTreatment">
-                    <option value="30">30 dias</option>
-                    <option value="60">60 dias</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="simulateFor">Simular para:</label>
-                <select id="simulateFor">
-                    <option value="30">30 dias</option>
-                    <option value="60">60 dias</option>
-                    <option value="90">90 dias</option>
-                    <option value="120">120 dias</option>
-                </select>
-            </div>
-            <button id="calculatePrice">Calcular</button>
-            <div id="calculationResult"></div>
+    <img id="calculatorIcon" src="imagens/calculator.svg" alt="Abrir Calculadora">
+    
+    <div class="calculator-content">
+        <button id="closeCalculator">X</button>
+        <h3>Calculadora de Preço</h3>
+        <div class="form-group">
+            <label for="currentTreatment">Tempo de Tratamento Atual:</label>
+            <select id="currentTreatment">
+                <option value="30">30 dias</option>
+                <option value="60">60 dias</option>
+            </select>
         </div>
+        <div class="form-group">
+            <label for="simulateFor">Simular para:</label>
+            <select id="simulateFor">
+                <option value="30">30 dias</option>
+                <option value="60">60 dias</option>
+                <option value="90">90 dias</option>
+                <option value="120">120 dias</option>
+            </select>
+        </div>
+        <button id="calculatePrice">Calcular</button>
+        <div id="calculationResult"></div>
     </div>
+</div>
+
 
     <script>
         const formatter = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 });
@@ -441,6 +453,24 @@ Totais Consolidados:
             };
         }
 
+        document.getElementById('calculator').addEventListener('click', function (event) {
+        const calculator = document.getElementById('calculator');
+        if (!calculator.classList.contains('expanded')) {
+            calculator.classList.add('expanded');
+        }
+        event.stopPropagation();
+    });
+
+    // Fechar a calculadora ao clicar no botão "X"
+    document.getElementById('closeCalculator').addEventListener('click', function (event) {
+        document.getElementById('calculator').classList.remove('expanded');
+        event.stopPropagation();
+    });
+
+
+
+
+        // Cálculo de preço ajustado conforme a duração do tratamento
         document.getElementById('calculatePrice').addEventListener('click', () => {
         const tempoTratamentoAtual = parseInt(document.getElementById('currentTreatment').value);
         const simularPara = parseInt(document.getElementById('simulateFor').value);
@@ -451,58 +481,28 @@ Totais Consolidados:
 
         if (tempoTratamentoAtual === 30) {
             switch (simularPara) {
-                case 30:
-                    multiplicador = 1;
-                    multiplicadorMes = 1;
-                    break;
-                case 60:
-                    multiplicador = 1.74;
-                    multiplicadorMes = 2;
-                    break;
-                case 90:
-                    multiplicador = 2.47;
-                    multiplicadorMes = 3;
-                    break;
-                case 120:
-                    multiplicador = 3.1;
-                    multiplicadorMes = 4;
-                    break;
+                case 30: multiplicador = 1; multiplicadorMes = 1; break;
+                case 60: multiplicador = 1.74; multiplicadorMes = 2; break;
+                case 90: multiplicador = 2.47; multiplicadorMes = 3; break;
+                case 120: multiplicador = 3.1; multiplicadorMes = 4; break;
             }
         } else if (tempoTratamentoAtual === 60) {
             switch (simularPara) {
-                case 30:
-                    multiplicador = 0.57;
-                    multiplicadorMes = 1;
-                    break;
-                case 60:
-                    multiplicador = 1;
-                    multiplicadorMes = 2;
-                    break;
-                case 90:
-                    multiplicador = 1.42;
-                    multiplicadorMes = 3;
-                    break;
-                case 120:
-                    multiplicador = 1.85;
-                    multiplicadorMes = 4;
-                    break;
+                case 30: multiplicador = 0.57; multiplicadorMes = 1; break;
+                case 60: multiplicador = 1; multiplicadorMes = 2; break;
+                case 90: multiplicador = 1.42; multiplicadorMes = 3; break;
+                case 120: multiplicador = 1.85; multiplicadorMes = 4; break;
             }
         }
 
-
-
-        // Cálculo do preço total ajustado
+        // Cálculo do novo valor ajustado
         const precoCalculado = totalGeral * multiplicador / multiplicadorMes;
+        const valorTotal = precoCalculado * multiplicadorMes;
+        const descontoAplicado = (totalGeral * multiplicadorMes) - valorTotal;
 
-        // Cálculo do valor total
-        const valototal = precoCalculado * multiplicadorMes;
-
-        // Cálculo do desconto aplicado
-        const descontoAplicado = (totalGeral * multiplicadorMes) - precoCalculado * multiplicadorMes;
-
-        // Exibir os resultados na calculadora
+        // Atualizar a exibição na calculadora
         document.getElementById('calculationResult').innerHTML = `
-            <p><strong>💰 Valor Total:</strong> R$ ${formatter.format(valototal.toFixed(2))}</p>
+            <p><strong>💰 Valor Total:</strong> R$ ${formatter.format(valorTotal.toFixed(2))}</p>
             <p><strong>📆 Valor por Mês:</strong> R$ ${formatter.format(precoCalculado.toFixed(2))}</p>
             <p><strong>🎉 Desconto Aplicado:</strong> R$ ${formatter.format(descontoAplicado.toFixed(2))}</p>
         `;
