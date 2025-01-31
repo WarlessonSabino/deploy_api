@@ -59,8 +59,7 @@ app.get('/requisicoes', (req, res) => {
                     (ROUND(fc15100.volume, 2)
                     || ' ' || 'doses' || ' ' || 
                     '(1 dose = ' || ' ' || ROUND(fc15100.qtcont, 0) || ' ' || 'Cápsulas).')
-                WHEN fc15100.tpformafarma THEN
-                     fc15100.qtfor
+                WHEN fc15100.tpformafarma = 6 THEN fc15100.qtfor
                 ELSE 
                     (ROUND(fc15100.volume, 2 )
                     || ' ' || fc15100.univol)
