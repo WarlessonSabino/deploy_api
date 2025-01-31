@@ -63,7 +63,7 @@ app.get('/requisicoes', (req, res) => {
                 ELSE 
                     (ROUND(fc15100.volume, 2)
                     || ' ' || fc15100.univol)
-            END AS "Quantidade"
+            END AS "Quantidade",
 
 
             CASE
