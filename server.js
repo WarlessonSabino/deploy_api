@@ -86,6 +86,9 @@ app.get('/requisicoes', (req, res) => {
                     END
                 AS "Quantidade Dosagem",
 
+
+            fc15110.qtfor AS "Quantidade Potes",    
+            
             CASE fc15100.qtaprov
                     WHEN 0 THEN '⬜'
             ELSE '✅'
