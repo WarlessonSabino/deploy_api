@@ -21,7 +21,7 @@ app.get('/requisicoes', (req, res) => {
         }
 
         const sqlQuery = `
-                        SELECT          
+            SELECT          
                 fc15100.cdfil || ' - ' || fc15100.nrorc || ' - ' || fc15100.serieo as "N° Orçamento",
                 fc15100.prcobr AS "Valor_Bruto",
                 fc15100.vrdsc AS "Valor_Desconto",
@@ -135,7 +135,11 @@ app.get('/requisicoes', (req, res) => {
             fc15110.unihp, 
             fc15110.unidaprd,
             fc15100.qtfor,
-            fc15100.qtaprov;
+            fc15110.itemid,
+            fc15100.qtaprov
+
+            ORDER BY fc15110.itemid ASC;          
+
         `;
 
         db.query(sqlQuery, [nrorc, cdfil], (err, result) => {
