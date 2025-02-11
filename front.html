@@ -384,7 +384,7 @@ Conte conosco para sua saúde e bem-estar!
                 message.innerHTML = `
                     <strong>📝 Orçamento N:</strong> ${numero}<br><br>                
                     <strong>Fórmula Farmacêutica:</strong> ${item['Fórmula Farmacêutica']}<br>
-                    <strong>Quantidade:</strong> ${item['Quantidade']}<br><br>
+                    <strong>Quantidade:</strong> ${item['Quantidade']}  <strong>Quantidade de Potes:</strong> ${item['Quantidade Potes']}<br><br> 
                     <strong>📦 Fórmula Manipulada:</strong><br>${componentesHtml}<br><br>
                     <strong>Bruto:</strong> R$ ${formattedBruto} 
                     | <strong>Desconto:</strong> R$ ${formattedDesconto} 
@@ -393,7 +393,7 @@ Conte conosco para sua saúde e bem-estar!
                 selectedContainer.appendChild(message);
 
                 copiedText += `
-📝 ORC:${formattedNumero} Quantidade: ${item['Quantidade']}
+📝 ORC:${formattedNumero} | Quantidade: ${item['Quantidade']} | Potes: ${item['Quantidade Potes']}
 
 
 Fórmula Manipulada:
