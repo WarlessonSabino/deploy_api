@@ -79,7 +79,7 @@ app.get('/requisicoes', (req, res) => {
                             WHEN fc15110.quant = 0 THEN fc15110.quanthp 
                             WHEN fc15100.tpformafarma = 6 THEN fc15100.qtfor
                             ELSE fc15110.quant
-                        END, 3
+                        END, 4
                     )|| ' ' ||
                      CASE
                         WHEN fc15110.unida IS NULL THEN ' ' || LOWER(fc15110.unihp)
