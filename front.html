@@ -238,6 +238,28 @@
 
 
     <script>
+
+     function formatQuantidadeDosagem(valor) {
+        // Extrair a parte numérica e a unidade de medida
+        let match = valor.match(/^([\d.]+)\s*(\S+.*)$/);
+        if (!match) return valor; // Retorna como está se não corresponder ao formato esperado
+
+        let numero = parseFloat(match[1]); // Converte para número
+        let unidade = match[2].trim(); // Remove espaços extras da unidade
+
+        // Se a unidade for '%' e o número for inteiro, remover decimais desnecessários
+        if (unidade === "%" && Number.isInteger(numero)) {
+            return `${numero}${unidade}`; // Exemplo: "4%"
+        }
+
+        // Se for um número inteiro, remove a parte decimal
+        if (Number.isInteger(numero)) {
+            return `${numero} ${unidade}`;
+        } else {
+            return `${numero.toString().replace(/\.?0+$/, '')} ${unidade}`; // Remove zeros desnecessários
+        }
+    }
+
         const formatter = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 });
 
         document.getElementById('fetchData').addEventListener('click', async () => {
@@ -360,9 +382,11 @@ Conte conosco para sua saúde e bem-estar!
                 const formattedNumero = numero.replace(/\s+/g, ''); 
 
                 // Consolidar os componentes
-                const componentesArray = detalhes.map(item => 
-                    `${item['Componentes da Fórmula']}: ${item['Quantidade Dosagem']}`
-                );
+                const componentesArray = detalhes.map(item => {
+                const quantidadeFormatada = formatQuantidadeDosagem(item['Quantidade Dosagem']);
+                return `${item['Componentes da Fórmula']}: ${quantidadeFormatada}`;
+                });
+
                 const componentesHtml = componentesArray.join('<br>');
                 const componentesText = componentesArray.join('\n');
 
