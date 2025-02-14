@@ -75,17 +75,15 @@ app.get('/requisicoes', (req, res) => {
             END AS "Componentes da Fórmula",
 
             ROUND(
-                        CASE 
-                            WHEN fc15110.quant = 0 THEN fc15110.quanthp 
-                            WHEN fc15100.tpformafarma = 6 THEN fc15100.qtfor
-                            ELSE fc15110.quant
-                        END, 4
-                    )|| ' ' ||
-                     CASE
-                        WHEN fc15110.unida IS NULL THEN ' ' || LOWER(fc15110.unihp)
-                        ELSE ' ' || LOWER(fc15110.unida) 
-                    END
-                AS "Quantidade Dosagem",
+                CASE 
+                    WHEN fc15110.quant = 0 THEN fc15110.quanthp 
+                    WHEN fc15110.quanthp IS NULL THEN 0
+                    WHEN fc15110.quant IS NULL THEN 0
+                    ELSE fc15110.quant
+                END, 4
+            ) || ' ' ||
+            COALESCE(LOWER(fc15110.unida), LOWER(fc15110.unihp), ' ') 
+            AS "Quantidade Dosagem",
             
             CASE fc15100.qtaprov
                     WHEN 0 THEN '⬜'
