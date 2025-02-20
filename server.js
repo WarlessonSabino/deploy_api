@@ -66,7 +66,15 @@ app.get('/requisicoes', (req, res) => {
                     || ' ' || fc15100.univol)
             END AS "Quantidade",
 
-            fc15100.qtfor AS "Quantidade Potes",   
+            CASE fc15100.tpformafarma
+                WHEN 3 THEN fc15100.qtfor || ' de ' || fc15100.qtcont || ' ' || fc15100.univol
+                WHEN 4 THEN fc15100.qtfor || ' de ' || fc15100.qtcont || ' ' || fc15100.univol
+                WHEN 5 THEN fc15100.qtfor || ' de ' || fc15100.qtcont || ' ' || fc15100.univol
+                WHEN 8 THEN fc15100.qtfor || ' de ' || fc15100.qtcont || ' ' || fc15100.univol
+                WHEN 12 THEN fc15100.qtfor || ' de ' || fc15100.qtcont || ' ' || fc15100.univol
+                WHEN 13 THEN fc15100.qtfor || ' de ' || fc15100.qtcont || ' ' || fc15100.univol
+                ELSE fc15100.qtfor
+            END AS "Quantidade Potes",     
 
             CASE
                 WHEN fc03000.descrprd <> fc15110.descr THEN fc15110.descr
