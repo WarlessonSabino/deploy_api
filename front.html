@@ -324,7 +324,7 @@
                         <input type="checkbox" class="orcamento-checkbox" 
                             data-numero="${numero}" 
                             data-status="${status}"
-                            data-detalhes="${JSON.stringify(detalhes)}">
+                            data-detalhes="${encodeURIComponent(JSON.stringify(detalhes))}">
                         ${numero}  ${status} 
                     </label>
                 `;
@@ -374,9 +374,10 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
             copiedText += introMessage;
 
             document.querySelectorAll('.orcamento-checkbox:checked').forEach(checkbox => {
-                const numero = checkbox.getAttribute('data-numero');
-                const detalhes = JSON.parse(checkbox.getAttribute('data-detalhes'));
-                const formattedNumero = (numero || '').replace(/\s+/g, '');
+            const numero = checkbox.getAttribute('data-numero');
+            const detalhes = JSON.parse(decodeURIComponent(checkbox.getAttribute('data-detalhes')));
+            const formattedNumero = (numero || '').replace(/\s+/g, ''); 
+
 
                 // Consolidar os componentes
                 const componentesArray = detalhes.map(item => {
