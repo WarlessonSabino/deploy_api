@@ -77,10 +77,11 @@ app.get('/requisicoes', (req, res) => {
             END AS "Quantidade Potes",     
 
             CASE
-            WHEN fc15110.cdpro <> fc15110.cdprin THEN (SELECT TRIM(fc03200.descrprd) FROM fc03200 WHERE CDSIN = fc15110.cdpro)
-            WHEN fc03000.descrprd <> fc15110.descr THEN fc15110.descr
-            ELSE TRIM(fc03000.descrprd)
-            END "Componentes da Fórmula",
+                WHEN fc03000.descrprd <> fc15110.descr THEN fc03000.descrprd
+                WHEN fc03000.descrprd <> fc15110.descr THEN fc15110.descr
+                WHEN fc03000.descrprd is null THEN fc15110.descr
+                ELSE fc03000.descrprd
+            END AS "Componentes da Fórmula",
 
             ROUND(
                 CASE 
