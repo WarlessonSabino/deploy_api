@@ -201,9 +201,9 @@
         <div id="selectedOrcamentos"></div>
 
         <div class="totals" id="totals">
-            <div>💰 Total Bruto: <span>R$ 0.00</span></div>
+            <div>💰 Total: <span>R$ 0.00</span></div>
             <div>🎉 Total Desconto: <span>R$ 0.00</span></div>
-            <div>💲 Total Geral: <span>R$ 0.00</span></div>
+            <div>💲 Total no PIX: <span>R$ 0.00</span></div>
         </div>
 
         <button id="copyButton" style="display: none;">Copiar Orçamentos</button>
@@ -270,9 +270,9 @@
             document.getElementById('options').innerHTML = '';
             document.getElementById('selectedOrcamentos').innerHTML = '';
             document.getElementById('totals').innerHTML = `
-                <div>💰 Total Bruto: <span>R$ 0.00</span></div>
+                <div>💰 Total: <span>R$ 0.00</span></div>
                 <div>🎉 Total Desconto: <span>R$ 0.00</span></div>
-                <div>💲 Total Geral: <span>R$ 0.00</span></div>
+                <div>💲 Total no PIX: <span>R$ 0.00</span></div>
             `;
             document.getElementById('results').style.display = 'none';
             document.getElementById('copyButton').style.display = 'none';
@@ -612,6 +612,7 @@ Totais Consolidados:
     </script>
 </body>
 </html>
+
 
 
 
