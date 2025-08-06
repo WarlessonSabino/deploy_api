@@ -100,10 +100,7 @@
         }
         #copyButton:hover {
             background: #218838;
-
         }
-
-        /* Estilos do widget da calculadora */
         #calculator {
             position: fixed;
             bottom: 20px;
@@ -120,12 +117,10 @@
             transition: width 0.3s ease, height 0.3s ease, border-radius 0.3s ease;
             overflow: hidden;
         }
-
         #calculator img {
             width: 30px;
             height: 30px;
         }
-
         #calculator.expanded {
             width: 300px;
             height: 450px;
@@ -137,42 +132,93 @@
             justify-content: start;
             cursor: default;
         }
-
         #calculator.expanded img {
-            display: none; /* Esconde o ícone ao expandir */
+            display: none;
         }
-
         .calculator-content {
             display: none;
             width: 100%;
         }
-
         #calculator.expanded .calculator-content {
             display: block;
         }
-
-        /* Botão de fechar a calculadora */
-        #closeCalculator {
-        position: absolute;
-        top: 10px; /* Ajusta a posição vertical */
-        left: 150px; /* Ajusta a posição horizontal */
-        background: none; /* Remove o fundo azul */
-        color: #007bff; /* Cor do "X" */
-        border: none; /* Remove borda */
-        font-size: 16px; /* Tamanho da fonte do "X" */
-        font-weight: bold; /* Peso do "X" */
-        cursor: pointer; /* Cursor em formato de mão */
-        line-height: normal; /* Remove inconsistências de altura de linha */
-        padding: 0; /* Remove espaço interno */
-    }
-
-
-
-        #calculator.expanded #closeCalculator {
-            display: block;
+        
+        /* Estilos corrigidos para o cabeçalho da calculadora */
+        .calculator-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 10px;
+            width: 100%;
         }
-
-
+        
+        .calculator-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            flex: 1;
+            text-align: center;
+            color: #333;
+        }
+        
+        .calculator-buttons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        #addRecommendation {
+            background: #ff9800;
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        
+        #addRecommendation:hover {
+            background: #ffb84d;
+        }
+        
+        #closeCalculator {
+            background: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        
+        #closeCalculator:hover {
+            background: #c82333;
+        }
+        
+        /* Botões da calculadora com layout melhorado */
+        .calculator-action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .calculator-action-buttons button {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -210,63 +256,63 @@
     </div>
 
     <div id="calculator">
-    <img id="calculatorIcon" src="imagens/calculator.svg" alt="Abrir Calculadora">
-    
-    <div class="calculator-content">
-        <button id="closeCalculator">X</button>
-        <h3>Calculadora de Preço</h3>
-        <div class="form-group">
-            <label for="currentTreatment">Tempo de Tratamento Atual:</label>
-            <select id="currentTreatment">
-                <option value="30">30 dias</option>
-                <option value="60">60 dias</option>
-            </select>
+        <img id="calculatorIcon" src="imagens/calculator.svg" alt="Abrir Calculadora">
+        <div class="calculator-content">
+            <div class="calculator-header">
+                <div class="calculator-buttons">
+                    <button id="addRecommendation" title="Adicionar sugestão ao preview">💡</button>
+                    <button id="closeCalculator" title="Fechar calculadora">×</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label style="font-size: 18px; font-weight: 600; display: block; margin-bottom: 15px; color: #333;">Calculadora de Preço</label>
+                <label for="currentTreatment">Tempo de Tratamento Atual:</label>
+                <select id="currentTreatment">
+                    <option value="30">30 dias</option>
+                    <option value="60">60 dias</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="simulateFor">Simular para:</label>
+                <select id="simulateFor">
+                    <option value="30">30 dias</option>
+                    <option value="60">60 dias</option>
+                    <option value="90">90 dias</option>
+                    <option value="120">120 dias</option>
+                </select>
+            </div>
+            
+            <div class="calculator-action-buttons">
+                <button id="calculatePrice">Calcular</button>
+            </div>
+            
+            <div id="calculationResult"></div>
+            <div id="recommendationPreview" style="margin-top:12px; font-style:italic; color:#007bff;"></div>
         </div>
-        <div class="form-group">
-            <label for="simulateFor">Simular para:</label>
-            <select id="simulateFor">
-                <option value="30">30 dias</option>
-                <option value="60">60 dias</option>
-                <option value="90">90 dias</option>
-                <option value="120">120 dias</option>
-            </select>
-        </div>
-        <button id="calculatePrice">Calcular</button>
-        <div id="calculationResult"></div>
     </div>
-</div>
-
 
     <script>
-
-     function formatQuantidadeDosagem(valor) {
-        // Extrair a parte numérica e a unidade de medida
-        let match = valor.match(/^([\d.]+)\s*(\S+.*)$/);
-        if (!match) return valor; // Retorna como está se não corresponder ao formato esperado
-
-        let numero = parseFloat(match[1]); // Converte para número
-        let unidade = match[2].trim(); // Remove espaços extras da unidade
-
-        // Se a unidade for '%' e o número for inteiro, remover decimais desnecessários
-        if (unidade === "%" && Number.isInteger(numero)) {
-            return `${numero}${unidade}`; // Exemplo: "4%"
+        function formatQuantidadeDosagem(valor) {
+            let match = valor.match(/^([\d.]+)\s*(\S+.*)$/);
+            if (!match) return valor;
+            let numero = parseFloat(match[1]);
+            let unidade = match[2].trim();
+            if (unidade === "%" && Number.isInteger(numero)) {
+                return `${numero}${unidade}`;
+            }
+            if (Number.isInteger(numero)) {
+                return `${numero} ${unidade}`;
+            } else {
+                return `${numero.toString().replace(/\.?0+$/, '')} ${unidade}`;
+            }
         }
-
-        // Se for um número inteiro, remove a parte decimal
-        if (Number.isInteger(numero)) {
-            return `${numero} ${unidade}`;
-        } else {
-            return `${numero.toString().replace(/\.?0+$/, '')} ${unidade}`; // Remove zeros desnecessários
-        }
-    }
 
         const formatter = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 });
 
         document.getElementById('fetchData').addEventListener('click', async () => {
-            const cdfil = document.getElementById('cdfil').value; // Código da filial
-            const nrorc = document.getElementById('nrorc').value; // Número do orçamento
-
-            // Limpar os resultados anteriores
+            const cdfil = document.getElementById('cdfil').value;
+            const nrorc = document.getElementById('nrorc').value;
             document.getElementById('options').innerHTML = '';
             document.getElementById('selectedOrcamentos').innerHTML = '';
             document.getElementById('totals').innerHTML = `
@@ -276,21 +322,17 @@
             `;
             document.getElementById('results').style.display = 'none';
             document.getElementById('copyButton').style.display = 'none';
-
             if (!cdfil || !nrorc) {
                 alert('Por favor, preencha os campos de filial e número do orçamento.');
                 return;
             }
-
             try {
                 const response = await fetch(`http://systempharmes.ddns.net:3000/requisicoes?nrorc=${nrorc}&cdfil=${cdfil}`);
                 if (!response.ok) {
                     throw new Error('Erro ao buscar os dados');
                 }
-
                 const data = await response.json();
                 renderResults(data);
-
                 document.getElementById('results').style.display = 'block';
                 document.getElementById('copyButton').style.display = 'block';
             } catch (error) {
@@ -301,63 +343,53 @@
         function renderResults(data) {
             const optionsContainer = document.getElementById('options');
             optionsContainer.innerHTML = '';
-
-            // Agrupar orçamentos únicos
             const groupedData = data.reduce((acc, item) => {
                 const numero = item['N° Orçamento'];
-                const status = item['Status']; // Obtendo o status
-
+                const status = item['Status'];
                 if (!acc[numero]) {
                     acc[numero] = { status, detalhes: [] };
                 }
                 acc[numero].detalhes.push(item);
                 return acc;
             }, {});
-
-            // Renderizar números únicos com status
             Object.keys(groupedData).forEach(numero => {
                 const { status, detalhes } = groupedData[numero];
-
                 const option = document.createElement('div');
                 option.innerHTML = `
                     <label>
-                        <input type="checkbox" class="orcamento-checkbox" 
-                            data-numero="${numero}" 
+                        <input type="checkbox" class="orcamento-checkbox"
+                            data-numero="${numero}"
                             data-status="${status}"
                             data-detalhes="${encodeURIComponent(JSON.stringify(detalhes))}">
-                        ${numero}  ${status} 
+                        ${numero}  ${status}
                     </label>
                 `;
                 optionsContainer.appendChild(option);
             });
-
-            // Selecionar todos ou desmarcar todos
             const selectAllCheckbox = document.getElementById('selectAll');
-            selectAllCheckbox.checked = false; // Resetar estado
+            selectAllCheckbox.checked = false;
             selectAllCheckbox.addEventListener('change', () => {
                 const isChecked = selectAllCheckbox.checked;
                 document.querySelectorAll('.orcamento-checkbox').forEach(checkbox => {
                     checkbox.checked = isChecked;
-                    checkbox.dispatchEvent(new Event('change')); // Atualizar seleção
+                    checkbox.dispatchEvent(new Event('change'));
                 });
             });
-
-            // Atualizar os resultados ao clicar em um checkbox
             document.querySelectorAll('.orcamento-checkbox').forEach(checkbox => {
                 checkbox.addEventListener('change', updateSelected);
             });
         }
 
         function updateSelected() {
+            let recommendationText = '';
+            // Não adiciona mais a recomendação no início, ela vai antes da conclusão
             const selectedContainer = document.getElementById('selectedOrcamentos');
             const totalsContainer = document.getElementById('totals');
-
             selectedContainer.innerHTML = '';
-            let totalBruto = 0; // Total bruto
-            let totalDesconto = 0; // Total de desconto
-            let totalGeral = 0; // Total geral
-            let copiedText = ''; // Texto a ser copiado
-
+            let totalBruto = 0;
+            let totalDesconto = 0;
+            let totalGeral = 0;
+            let copiedText = '';
             const introMessage = `
 ✨ Obrigado por escolher nossa farmácia de manipulação! ✨
 
@@ -370,33 +402,39 @@ Assim que aprovado, nossa equipe começa imediatamente a manipular sua fórmula 
 Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e bem-estar! 
 
 `;
-
             copiedText += introMessage;
+            // Removido recommendationText daqui
+            
+            // SE A RECOMENDAÇÃO ESTIVER PRESENTE, ADICIONA AO PREVIEW
+            if (window.lastRecommendation) {
+                let old = document.getElementById('recommendationInPreview');
+                if (old) old.remove();
+                
+                let recomendDiv = document.createElement('div');
+                recomendDiv.id = 'recommendationInPreview';
+                recomendDiv.className = 'message';
+                recomendDiv.style.background = '#fffbe6';
+                recomendDiv.innerHTML = `<strong>💡 Sugestão personalizada:</strong><br>${window.lastRecommendation}`;
+                selectedContainer.appendChild(recomendDiv);
+            }
 
             document.querySelectorAll('.orcamento-checkbox:checked').forEach(checkbox => {
-            const numero = checkbox.getAttribute('data-numero');
-            const detalhes = JSON.parse(decodeURIComponent(checkbox.getAttribute('data-detalhes')));
-            const formattedNumero = (numero || '').replace(/\s+/g, ''); 
-
-
-                // Consolidar os componentes
+                const numero = checkbox.getAttribute('data-numero');
+                const detalhes = JSON.parse(decodeURIComponent(checkbox.getAttribute('data-detalhes')));
+                const formattedNumero = (numero || '').replace(/\s+/g, '');
                 const componentesArray = detalhes.map(item => {
-                const quantidadeFormatada = formatQuantidadeDosagem(item['Quantidade Dosagem']);
-                return `${item['Componentes da Fórmula']}: ${quantidadeFormatada}`;
+                    const quantidadeFormatada = formatQuantidadeDosagem(item['Quantidade Dosagem']);
+                    return `${item['Componentes da Fórmula']}: ${quantidadeFormatada}`;
                 });
-
                 const componentesHtml = componentesArray.join('<br>');
                 const componentesText = componentesArray.join('\n');
-
-                const item = detalhes[0]; 
+                const item = detalhes[0];
                 const bruto = parseFloat(item['Valor_Bruto']);
                 const desconto = parseFloat(item['Valor_Desconto']);
                 const geral = parseFloat(item['Valor a Pagar']);
-
                 totalBruto += bruto;
                 totalDesconto += desconto;
                 totalGeral += geral;
-
                 const formattedBruto = formatter.format(bruto);
                 const formattedDesconto = formatter.format(desconto);
                 const formattedGeral = formatter.format(geral);
@@ -404,7 +442,7 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
                 const message = document.createElement('div');
                 message.classList.add('message');
                 message.innerHTML = `
-                    <strong>📝 Orçamento N:</strong> ${numero}<br><br>                
+                    <strong>📝 Orçamento N:</strong> ${numero}<br><br>
                     <strong>Fórmula Farmacêutica:</strong> ${item['Fórmula Farmacêutica']}<br>
                     <strong>Quantidade:</strong> ${item['Quantidade']}  <strong>Quantidade de Potes:</strong> ${item['Quantidade Potes']}<br><br> 
                     <strong>📦 Fórmula Manipulada:</strong><br>${componentesHtml}<br><br>
@@ -417,7 +455,6 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
                 copiedText += `
 📝 ORC:${formattedNumero} | Quantidade: ${item['Quantidade']} | Potes: ${item['Quantidade Potes']}
 
-
 Fórmula Manipulada:
 ${componentesText}
 
@@ -425,7 +462,6 @@ ${desconto > 0 ? `Total: R$ ${formattedBruto} | Total de Descontos: R$ ${formatt
 
 `;
             });
-
             if (totalDesconto > 0) {
                 copiedText += `
 Totais Consolidados:
@@ -449,10 +485,20 @@ Totais Consolidados:
                 <div>🎉 Total Desconto: <span>R$ ${formatter.format(totalDesconto)}</span></div>
                 <div>💲 Total no PIX: <span>R$ ${formatter.format(totalGeral)}</span></div>
             `;
-
             document.getElementById('copyButton').onclick = () => {
+                // Monta o texto final com a recomendação no momento da cópia
+                let finalText = copiedText;
+                
+                // Se existe recomendação, insere antes da mensagem de conclusão
+                if (window.lastRecommendation) {
+                    finalText = finalText.replace(
+                        conclusionMessage,
+                        `💡 Sugestão Exclusiva: ${window.lastRecommendation}\n\n${conclusionMessage}`
+                    );
+                }
+                
                 if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(copiedText).then(() => {
+                    navigator.clipboard.writeText(finalText).then(() => {
                         alert('Orçamentos copiados com sucesso!');
                     }).catch(err => {
                         console.error('Erro ao copiar para a área de transferência:', err);
@@ -460,7 +506,7 @@ Totais Consolidados:
                     });
                 } else {
                     const textarea = document.createElement('textarea');
-                    textarea.value = copiedText;
+                    textarea.value = finalText;
                     document.body.appendChild(textarea);
                     textarea.select();
                     try {
@@ -475,147 +521,90 @@ Totais Consolidados:
             };
         }
 
+        let lastRecommendation = "";
+        let lastSimulateDias = 30;
+        let lastDesconto = 0;
+        let lastValor = 0;
+
         document.getElementById('calculator').addEventListener('click', function (event) {
-        const calculator = document.getElementById('calculator');
-        if (!calculator.classList.contains('expanded')) {
-            calculator.classList.add('expanded');
-        }
-        event.stopPropagation();
-    });
-
-    // Fechar a calculadora ao clicar no botão "X"
-    document.getElementById('closeCalculator').addEventListener('click', function (event) {
-        document.getElementById('calculator').classList.remove('expanded');
-        event.stopPropagation();
-    });
-
-
-
-
-        // Cálculo de preço ajustado conforme a duração do tratamento
-        document.getElementById('calculatePrice').addEventListener('click', () => {
-        const tempoTratamentoAtual = parseInt(document.getElementById('currentTreatment').value);
-        const simularPara = parseInt(document.getElementById('simulateFor').value);
-        const totalGeral = parseFloat(document.querySelectorAll('#totals span')[2].innerText.replace('R$', '').replace('.', '').replace(',', '.'));
-
-        let multiplicador;
-        let multiplicadorMes;
-
-        if (tempoTratamentoAtual === 30) {
-            switch (simularPara) {
-                case 30: multiplicador = 1; multiplicadorMes = 1; break;
-                case 60: multiplicador = 1.74; multiplicadorMes = 2; break;
-                case 90: multiplicador = 2.47; multiplicadorMes = 3; break;
-                case 120: multiplicador = 3.1; multiplicadorMes = 4; break;
+            const calculator = document.getElementById('calculator');
+            if (!calculator.classList.contains('expanded')) {
+                calculator.classList.add('expanded');
             }
-        } else if (tempoTratamentoAtual === 60) {
-            switch (simularPara) {
-                case 30: multiplicador = 0.57; multiplicadorMes = 1; break;
-                case 60: multiplicador = 1; multiplicadorMes = 2; break;
-                case 90: multiplicador = 1.42; multiplicadorMes = 3; break;
-                case 120: multiplicador = 1.85; multiplicadorMes = 4; break;
-            }
-        }
-
-        // Cálculo do novo valor ajustado
-        const precoCalculado = totalGeral * multiplicador / multiplicadorMes;
-        const valorTotal = precoCalculado * multiplicadorMes;
-        const descontoAplicado = (totalGeral * multiplicadorMes) - valorTotal;
-
-        // Atualizar a exibição na calculadora
-        document.getElementById('calculationResult').innerHTML = `
-            <p><strong>💰 Valor Total:</strong> R$ ${formatter.format(valorTotal.toFixed(2))}</p>
-            <p><strong>📆 Valor por Mês:</strong> R$ ${formatter.format(precoCalculado.toFixed(2))}</p>
-            <p><strong>🎉 Desconto Aplicado:</strong> R$ ${formatter.format(descontoAplicado.toFixed(2))}</p>
-        `;
-    });
-
-
-        // Lógica para expandir e colapsar a calculadora
-        const toggleCalculator = document.getElementById('toggleCalculator');
-        const calculatorContent = document.getElementById('calculatorContent');
-        const calculator = document.getElementById('calculator');
-
-        toggleCalculator.addEventListener('click', () => {
-            calculator.classList.toggle('expanded');
-            calculatorContent.classList.toggle('active');
+            event.stopPropagation();
         });
 
-        document.getElementById('applyCalculation').addEventListener('click', () => {
-    const tempoTratamentoAtual = parseInt(document.getElementById('currentTreatment').value);
-    const simularPara = parseInt(document.getElementById('simulateFor').value);
-    const totalGeral = parseFloat(document.querySelectorAll('#totals span')[2].innerText.replace('R$', '').replace('.', '').replace(',', '.'));
+        document.getElementById('closeCalculator').addEventListener('click', function (event) {
+            document.getElementById('calculator').classList.remove('expanded');
+            event.stopPropagation();
+        });
 
-    let multiplicador;
-    let multiplicadorMes;
+        document.getElementById('calculatePrice').addEventListener('click', () => {
+            const tempoTratamentoAtual = parseInt(document.getElementById('currentTreatment').value);
+            const simularPara = parseInt(document.getElementById('simulateFor').value);
+            lastSimulateDias = simularPara;
+            const totalGeral = parseFloat(document.querySelectorAll('#totals span')[2].innerText.replace('R$', '').replace('.', '').replace(',', '.'));
+            let multiplicador, multiplicadorMes;
+            if (tempoTratamentoAtual === 30) {
+                switch (simularPara) {
+                    case 30: multiplicador = 1; multiplicadorMes = 1; break;
+                    case 60: multiplicador = 1.74; multiplicadorMes = 2; break;
+                    case 90: multiplicador = 2.47; multiplicadorMes = 3; break;
+                    case 120: multiplicador = 3.1; multiplicadorMes = 4; break;
+                }
+            } else if (tempoTratamentoAtual === 60) {
+                switch (simularPara) {
+                    case 30: multiplicador = 0.57; multiplicadorMes = 1; break;
+                    case 60: multiplicador = 1; multiplicadorMes = 2; break;
+                    case 90: multiplicador = 1.42; multiplicadorMes = 3; break;
+                    case 120: multiplicador = 1.85; multiplicadorMes = 4; break;
+                }
+            }
+            const precoCalculado = totalGeral * multiplicador / multiplicadorMes;
+            const valorTotal = precoCalculado * multiplicadorMes;
+            const descontoAplicado = (totalGeral * multiplicadorMes) - valorTotal;
+            lastRecommendation = `Que tal manipular para ${simularPara} dias? Você recebe R$ ${formatter.format(descontoAplicado.toFixed(2))} de desconto e seu pedido sai por R$ ${formatter.format(valorTotal.toFixed(2))}.`;
+            document.getElementById('calculationResult').innerHTML = `
+                <p><strong>💰 Valor Total:</strong> R$ ${formatter.format(valorTotal.toFixed(2))}</p>
+                <p><strong>📆 Valor por Mês:</strong> R$ ${formatter.format(precoCalculado.toFixed(2))}</p>
+                <p><strong>🎉 Desconto Aplicado:</strong> R$ ${formatter.format(descontoAplicado.toFixed(2))}</p>
+            `;
+        });
 
-    if (tempoTratamentoAtual === 30) {
-        switch (simularPara) {
-            case 30:
-                multiplicador = 1;
-                multiplicadorMes = 1;
-                break;
-            case 60:
-                multiplicador = 1.73;
-                multiplicadorMes = 2;
-                break;
-            case 90:
-                multiplicador = 2.35;
-                multiplicadorMes = 3;
-                break;
-            case 120:
-                multiplicador = 2.94;
-                multiplicadorMes = 4;
-                break;
-        }
-    } else if (tempoTratamentoAtual === 60) {
-        switch (simularPara) {
-            case 30:
-                multiplicador = 0.57;
-                multiplicadorMes = 1;
-                break;
-            case 60:
-                multiplicador = 1;
-                multiplicadorMes = 2;
-                break;
-            case 90:
-                multiplicador = 1.46;
-                multiplicadorMes = 3;
-                break;
-            case 120:
-                multiplicador = 1.80;
-                multiplicadorMes = 4;
-                break;
-        }
-    }
+        document.getElementById('addRecommendation').addEventListener('click', () => {
+            if (!lastRecommendation) {
+                alert('Realize o cálculo antes de adicionar a recomendação.');
+                return;
+            }
+            let selected = document.getElementById('selectedOrcamentos');
+            let old = document.getElementById('recommendationInPreview');
+            if (old) old.remove();
 
-    const precoCalculado = totalGeral * multiplicador * multiplicadorMes;
-    const formattedPrice = formatter.format(precoCalculado.toFixed(2));
+            let recomendDiv = document.createElement('div');
+            recomendDiv.id = 'recommendationInPreview';
+            recomendDiv.className = 'message';
+            recomendDiv.style.background = '#fffbe6';
+            recomendDiv.style.position = 'relative';
 
-    // Atualizar os orçamentos exibidos
-    document.querySelectorAll('.message').forEach(message => {
-        const tempoTratamentoTexto = `<strong>📅 Tratamento para:</strong> ${simularPara} dias<br>`;
-        const novoValor = `<strong>💲 Novo Valor:</strong> R$ ${formattedPrice}`;
-        
-        // Removendo os valores antigos
-        message.innerHTML = message.innerHTML.replace(/<strong>Bruto:<\/strong>.*?<br>/, '');
-        message.innerHTML = message.innerHTML.replace(/<strong>Desconto:<\/strong>.*?<br>/, '');
-        message.innerHTML = message.innerHTML.replace(/<strong>Geral:<\/strong>.*?<br>/, '');
-        
-        // Adicionando a nova informação com tratamento ajustado
-        message.innerHTML += `<br>${tempoTratamentoTexto}${novoValor}`;
-    });
+            let closeBtn = document.createElement('span');
+            closeBtn.textContent = '✖';
+            closeBtn.title = 'Remover sugestão';
+            closeBtn.style.position = 'absolute';
+            closeBtn.style.top = '8px';
+            closeBtn.style.right = '12px';
+            closeBtn.style.cursor = 'pointer';
+            closeBtn.style.fontWeight = 'bold';
+            closeBtn.style.color = '#ff9800';
+            closeBtn.onclick = function() {
+                recomendDiv.remove();
+                window.lastRecommendation = '';
+            };
 
-    alert(`Orçamentos atualizados para tratamento de ${simularPara} dias com valor R$ ${formattedPrice}!`);
-});
-
+            recomendDiv.innerHTML = `<strong>💡 Sugestão personalizada:</strong><br>${lastRecommendation}`;
+            recomendDiv.appendChild(closeBtn);
+            selected.prepend(recomendDiv);
+            window.lastRecommendation = lastRecommendation;
+        });
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
