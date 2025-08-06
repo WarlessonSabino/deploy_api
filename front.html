@@ -445,9 +445,9 @@ Totais Consolidados:
             copiedText += conclusionMessage;
 
             totalsContainer.innerHTML = `
-                <div>💰 Total Bruto: <span>R$ ${formatter.format(totalBruto)}</span></div>
+                <div>💰 Total: <span>R$ ${formatter.format(totalBruto)}</span></div>
                 <div>🎉 Total Desconto: <span>R$ ${formatter.format(totalDesconto)}</span></div>
-                <div>💲 Total Geral: <span>R$ ${formatter.format(totalGeral)}</span></div>
+                <div>💲 Total no PIX: <span>R$ ${formatter.format(totalGeral)}</span></div>
             `;
 
             document.getElementById('copyButton').onclick = () => {
@@ -612,5 +612,6 @@ Totais Consolidados:
     </script>
 </body>
 </html>
+
 
 
