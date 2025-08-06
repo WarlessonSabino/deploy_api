@@ -429,16 +429,16 @@ ${desconto > 0 ? `Sub-Total: R$ ${formattedBruto} | Total de Descontos: R$ ${for
             if (totalDesconto > 0) {
                 copiedText += `
 Totais Consolidados:
-💰 SUB-TOTAL: R$ ${formatter.format(totalBruto)}
+💰 TOTAL: R$ ${formatter.format(totalBruto)}
 🎉 TOTAL DE DESCONTOS: R$ ${formatter.format(totalDesconto)}
-💲 TOTAL: R$ ${formatter.format(totalGeral)}
+💲 TOTAL NO PIX: R$ ${formatter.format(totalGeral)}
 
 `;
             } else {
                 copiedText += `
 Totais Consolidados:
 💰 SUB-TOTAL: R$ ${formatter.format(totalBruto)}
-💲 TOTAL: R$ ${formatter.format(totalGeral)}
+💲 TOTAL NO PIX: R$ ${formatter.format(totalGeral)}
 
 `;
             }
@@ -612,3 +612,4 @@ Totais Consolidados:
     </script>
 </body>
 </html>
+
