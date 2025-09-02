@@ -122,8 +122,8 @@
             height: 30px;
         }
         #calculator.expanded {
-            width: 300px;
-            height: 450px;
+            width: 320px;
+            height: 550px;
             border-radius: 8px;
             padding: 20px;
             display: flex;
@@ -143,7 +143,6 @@
             display: block;
         }
         
-        /* Estilos corrigidos para o cabeçalho da calculadora */
         .calculator-header {
             display: flex;
             justify-content: flex-end;
@@ -207,7 +206,6 @@
             background: #c82333;
         }
         
-        /* Botões da calculadora com layout melhorado */
         .calculator-action-buttons {
             display: flex;
             gap: 10px;
@@ -271,6 +269,8 @@
                 <select id="currentTreatment">
                     <option value="30">30 dias</option>
                     <option value="60">60 dias</option>
+                    <option value="90">90 dias</option>
+                    <option value="120">120 dias</option>
                 </select>
             </div>
             <div class="form-group">
@@ -382,7 +382,6 @@
 
         function updateSelected() {
             let recommendationText = '';
-            // Não adiciona mais a recomendação no início, ela vai antes da conclusão
             const selectedContainer = document.getElementById('selectedOrcamentos');
             const totalsContainer = document.getElementById('totals');
             selectedContainer.innerHTML = '';
@@ -403,9 +402,7 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
 
 `;
             copiedText += introMessage;
-            // Removido recommendationText daqui
             
-            // SE A RECOMENDAÇÃO ESTIVER PRESENTE, ADICIONA AO PREVIEW
             if (window.lastRecommendation) {
                 let old = document.getElementById('recommendationInPreview');
                 if (old) old.remove();
@@ -486,10 +483,8 @@ Totais Consolidados:
                 <div>💲 Total no PIX: <span>R$ ${formatter.format(totalGeral)}</span></div>
             `;
             document.getElementById('copyButton').onclick = () => {
-                // Monta o texto final com a recomendação no momento da cópia
                 let finalText = copiedText;
                 
-                // Se existe recomendação, insere antes da mensagem de conclusão
                 if (window.lastRecommendation) {
                     finalText = finalText.replace(
                         conclusionMessage,
@@ -543,32 +538,105 @@ Totais Consolidados:
             const tempoTratamentoAtual = parseInt(document.getElementById('currentTreatment').value);
             const simularPara = parseInt(document.getElementById('simulateFor').value);
             lastSimulateDias = simularPara;
+            
             const totalGeral = parseFloat(document.querySelectorAll('#totals span')[2].innerText.replace('R$', '').replace('.', '').replace(',', '.'));
+            
+            const numeroOrcamentos = document.querySelectorAll('.orcamento-checkbox:checked').length;
+            
+            if (numeroOrcamentos === 0) {
+                alert('Selecione pelo menos um orçamento para calcular.');
+                return;
+            }
+
             let multiplicador, multiplicadorMes;
-            if (tempoTratamentoAtual === 30) {
+
+if (tempoTratamentoAtual === 30) {
                 switch (simularPara) {
                     case 30: multiplicador = 1; multiplicadorMes = 1; break;
-                    case 60: multiplicador = 1.74; multiplicadorMes = 2; break;
-                    case 90: multiplicador = 2.47; multiplicadorMes = 3; break;
-                    case 120: multiplicador = 3.1; multiplicadorMes = 4; break;
+                    case 60: multiplicador = 1.68; multiplicadorMes = 2; break;
+                    case 90: multiplicador = 2.24; multiplicadorMes = 3; break;
+                    case 120: multiplicador = 2.78; multiplicadorMes = 4; break;
                 }
             } else if (tempoTratamentoAtual === 60) {
                 switch (simularPara) {
                     case 30: multiplicador = 0.57; multiplicadorMes = 1; break;
                     case 60: multiplicador = 1; multiplicadorMes = 2; break;
-                    case 90: multiplicador = 1.42; multiplicadorMes = 3; break;
-                    case 120: multiplicador = 1.85; multiplicadorMes = 4; break;
+                    case 90: multiplicador = 1.33; multiplicadorMes = 3; break;
+                    case 120: multiplicador = 1.74; multiplicadorMes = 4; break;
+                }
+            } else if (tempoTratamentoAtual === 90) {
+                switch (simularPara) {
+                    case 30: multiplicador = 0.42; multiplicadorMes = 1; break;
+                    case 60: multiplicador = 0.7; multiplicadorMes = 2; break;
+                    case 90: multiplicador = 1; multiplicadorMes = 3; break;
+                    case 120: multiplicador = 1.26; multiplicadorMes = 4; break;
+                }
+            } else if (tempoTratamentoAtual === 120) {
+                switch (simularPara) {
+                    case 30: multiplicador = 0.32; multiplicadorMes = 1; break;
+                    case 60: multiplicador = 0.60; multiplicadorMes = 2; break;
+                    case 90: multiplicador = 0.80; multiplicadorMes = 3; break;
+                    case 120: multiplicador = 1; multiplicadorMes = 4; break;
                 }
             }
+
             const precoCalculado = totalGeral * multiplicador / multiplicadorMes;
             const valorTotal = precoCalculado * multiplicadorMes;
-            const descontoAplicado = (totalGeral * multiplicadorMes) - valorTotal;
-            lastRecommendation = `Que tal manipular para ${simularPara} dias? Você recebe R$ ${formatter.format(descontoAplicado.toFixed(2))} de desconto e seu pedido sai por R$ ${formatter.format(valorTotal.toFixed(2))}.`;
+            
+            const descontoAplicado = (tempoTratamentoAtual === simularPara) ? 
+                0 : 
+                Math.abs((totalGeral * (simularPara / tempoTratamentoAtual)) - valorTotal);
+            
+            const ticketMedioAtual = totalGeral / numeroOrcamentos;
+            const ticketMedioNovo = valorTotal / numeroOrcamentos;
+            const percentualAumento = ((ticketMedioNovo - ticketMedioAtual) / ticketMedioAtual) * 100;
+            
+            let ticketMedioMsg = '';
+            let ticketMedioIcon = '';
+            let ticketMedioStyle = '';
+            
+            if (percentualAumento > 0) {
+                ticketMedioIcon = '📈';
+                ticketMedioStyle = 'color: #28a745; font-weight: bold;';
+                ticketMedioMsg = `${ticketMedioIcon} <span style="${ticketMedioStyle}">Ticket médio: R$ ${formatter.format(ticketMedioAtual.toFixed(2))} → R$ ${formatter.format(ticketMedioNovo.toFixed(2))} (+${percentualAumento.toFixed(1)}%)</span>`;
+            } else if (percentualAumento < 0) {
+                ticketMedioIcon = '📉';
+                ticketMedioStyle = 'color: #dc3545; font-weight: bold;';
+                ticketMedioMsg = `${ticketMedioIcon} <span style="${ticketMedioStyle}">Ticket médio: R$ ${formatter.format(ticketMedioAtual.toFixed(2))} → R$ ${formatter.format(ticketMedioNovo.toFixed(2))} (${percentualAumento.toFixed(1)}%)</span>`;
+            } else {
+                ticketMedioIcon = '➡️';
+                ticketMedioStyle = 'color: #6c757d; font-weight: bold;';
+                ticketMedioMsg = `${ticketMedioIcon} <span style="${ticketMedioStyle}">Ticket médio mantido: R$ ${formatter.format(ticketMedioAtual.toFixed(2))}</span>`;
+            }
+            
             document.getElementById('calculationResult').innerHTML = `
                 <p><strong>💰 Valor Total:</strong> R$ ${formatter.format(valorTotal.toFixed(2))}</p>
                 <p><strong>📆 Valor por Mês:</strong> R$ ${formatter.format(precoCalculado.toFixed(2))}</p>
-                <p><strong>🎉 Desconto Aplicado:</strong> R$ ${formatter.format(descontoAplicado.toFixed(2))}</p>
+                ${descontoAplicado > 0 ? 
+                    `<p><strong>🎉 Desconto Aplicado:</strong> R$ ${formatter.format(descontoAplicado.toFixed(2))}</p>` : 
+                    ''
+                }
+                <div style="margin-top: 12px; padding: 8px 12px; background: ${percentualAumento > 0 ? '#d4edda' : percentualAumento < 0 ? '#f8d7da' : '#e9ecef'}; border-radius: 6px; border-left: 3px solid ${percentualAumento > 0 ? '#28a745' : percentualAumento < 0 ? '#dc3545' : '#6c757d'};">
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+                        <span style="font-size: 14px;">${ticketMedioIcon}</span>
+                        <strong style="font-size: 13px; color: ${percentualAumento > 0 ? '#155724' : percentualAumento < 0 ? '#721c24' : '#495057'};">
+                            R$ ${formatter.format(ticketMedioAtual.toFixed(2))} → R$ ${formatter.format(ticketMedioNovo.toFixed(2))}
+                            ${percentualAumento !== 0 ? `(${percentualAumento > 0 ? '+' : ''}${percentualAumento.toFixed(1)}%)` : ''}
+                        </strong>
+                    </div>
+                    <small style="color: #6c757d; font-size: 11px;">Ticket médio • ${numeroOrcamentos} orçamento${numeroOrcamentos > 1 ? 's' : ''}</small>
+                </div>
             `;
+            
+            if (tempoTratamentoAtual === simularPara) {
+                lastRecommendation = `Mantendo ${simularPara} dias, o valor permanece R$ ${formatter.format(valorTotal.toFixed(2))}.`;
+            } else if (percentualAumento > 0) {
+                lastRecommendation = `💡 Oportunidade de ouro! Manipulando para ${simularPara} dias, você aumenta seu ticket médio em ${percentualAumento.toFixed(1)}% (de R$ ${formatter.format(ticketMedioAtual.toFixed(2))} para R$ ${formatter.format(ticketMedioNovo.toFixed(2))}), ${descontoAplicado > 0 ? `oferece R$ ${formatter.format(descontoAplicado.toFixed(2))} de desconto ao cliente ` : ''}e o pedido sai por R$ ${formatter.format(valorTotal.toFixed(2))}. Uma venda mais valiosa para todos! 🎯`;
+            } else if (percentualAumento < 0) {
+                lastRecommendation = `Manipulando para ${simularPara} dias, o valor fica R$ ${formatter.format(valorTotal.toFixed(2))}. O ticket médio reduz para R$ ${formatter.format(ticketMedioNovo.toFixed(2))} (${percentualAumento.toFixed(1)}%).`;
+            } else {
+                lastRecommendation = `Manipulando para ${simularPara} dias, o valor fica R$ ${formatter.format(valorTotal.toFixed(2))}. Ticket médio mantido em R$ ${formatter.format(ticketMedioAtual.toFixed(2))}.`;
+            }
         });
 
         document.getElementById('addRecommendation').addEventListener('click', () => {
