@@ -327,7 +327,7 @@
                 return;
             }
             try {
-                const response = await fetch(`http://systempharmes.ddns.net:3000/requisicoes?nrorc=${nrorc}&cdfil=${cdfil}`);
+                const response = await fetch(`http://pharmesdev.ddns.net:3000/requisicoes?nrorc=${nrorc}&cdfil=${cdfil}`);
                 if (!response.ok) {
                     throw new Error('Erro ao buscar os dados');
                 }
@@ -676,3 +676,4 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
+
