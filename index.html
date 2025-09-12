@@ -326,8 +326,9 @@
                 alert('Por favor, preencha os campos de filial e número do orçamento.');
                 return;
             }
-            try {
-                const response = await fetch(`http://pharmesdev.ddns.net:3000/requisicoes?nrorc=${nrorc}&cdfil=${cdfil}`);
+            try { 
+
+                const response = await fetch(`https://pharmesdev.ddns.net/consulta_orçamento/api/node/requisicoes?nrorc=${nrorc}&cdfil=${cdfil}`);
                 if (!response.ok) {
                     throw new Error('Erro ao buscar os dados');
                 }
@@ -676,4 +677,5 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
+
 
