@@ -247,7 +247,7 @@
         <div class="totals" id="totals">
             <div>💰 Total: <span>R$ 0.00</span></div>
             <div>🎉 Total Desconto: <span>R$ 0.00</span></div>
-            <div>💲 Total no PIX: <span>R$ 0.00</span></div>
+            <div>💲 Total no dia do cliente: <span>R$ 0.00</span></div>
         </div>
 
         <button id="copyButton" style="display: none;">Copiar Orçamentos</button>
@@ -465,14 +465,14 @@ ${desconto > 0 ? `Total: R$ ${formattedBruto} | Total de Descontos: R$ ${formatt
 Totais Consolidados:
 💰 TOTAL: R$ ${formatter.format(totalBruto)}
 🎉 TOTAL DE DESCONTOS: R$ ${formatter.format(totalDesconto)}
-💲 TOTAL NO PIX: R$ ${formatter.format(totalGeral)}
+💲 TOTAL NO DIA DO CLIENTE: R$ ${formatter.format(totalGeral)}
 
 `;
             } else {
                 copiedText += `
 Totais Consolidados:
 💰 TOTAL: R$ ${formatter.format(totalBruto)}
-💲 TOTAL NO PIX: R$ ${formatter.format(totalGeral)}
+💲 TOTAL NO DIA DO CLIENTE: R$ ${formatter.format(totalGeral)}
 
 `;
             }
@@ -481,7 +481,7 @@ Totais Consolidados:
             totalsContainer.innerHTML = `
                 <div>💰 Total: <span>R$ ${formatter.format(totalBruto)}</span></div>
                 <div>🎉 Total Desconto: <span>R$ ${formatter.format(totalDesconto)}</span></div>
-                <div>💲 Total no PIX: <span>R$ ${formatter.format(totalGeral)}</span></div>
+                <div>💲 Total no dia do Cliente: <span>R$ ${formatter.format(totalGeral)}</span></div>
             `;
             document.getElementById('copyButton').onclick = () => {
                 let finalText = copiedText;
@@ -677,5 +677,4 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
-
 
