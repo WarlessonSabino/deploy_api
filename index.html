@@ -439,16 +439,44 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
 
                 const message = document.createElement('div');
                 message.classList.add('message');
-                message.innerHTML = `
+                message.style.position = "relative"; 
+
+                let closeBtn = document.createElement('span');
+                closeBtn.textContent = '✖';
+                closeBtn.title = 'Remover este orçamento';
+                closeBtn.style.position = 'absolute';
+                closeBtn.style.top = '8px';
+                closeBtn.style.right = '12px';
+                closeBtn.style.cursor = 'pointer';
+                closeBtn.style.fontWeight = 'bold';
+                closeBtn.style.color = '#dc3545';
+
+                closeBtn.onclick = () => {
+                    const check = document.querySelector(
+                        `.orcamento-checkbox[data-numero="${numero}"]`
+                    );
+                    if (check) {
+                        check.checked = false;
+                        check.dispatchEvent(new Event('change'));
+                    }
+                };
+
+                message.appendChild(closeBtn);
+
+                message.insertAdjacentHTML("beforeend", `
                     <strong>📝 Orçamento N:</strong> ${numero}<br><br>
                     <strong>Fórmula Farmacêutica:</strong> ${item['Fórmula Farmacêutica']}<br>
-                    <strong>Quantidade:</strong> ${item['Quantidade']}  <strong>Quantidade de Potes:</strong> ${item['Quantidade Potes']}<br><br> 
+                    <strong>Quantidade:</strong> ${item['Quantidade']}  
+                    <strong>Quantidade de Potes:</strong> ${item['Quantidade Potes']}<br><br> 
                     <strong>📦 Fórmula Manipulada:</strong><br>${componentesHtml}<br><br>
                     <strong>Bruto:</strong> R$ ${formattedBruto} 
                     | <strong>Desconto:</strong> R$ ${formattedDesconto} 
                     | <strong>Geral:</strong> R$ ${formattedGeral}
-                `;
+                `);
+
                 selectedContainer.appendChild(message);
+
+
 
                 copiedText += `
 📝 ORC:${formattedNumero} | Quantidade: ${item['Quantidade']} | Potes: ${item['Quantidade Potes']}
@@ -677,6 +705,5 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
-
 
 
