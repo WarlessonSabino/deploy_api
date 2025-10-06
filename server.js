@@ -96,7 +96,9 @@ app.get('/requisicoes', (req, res) => {
             CASE fc15100.qtaprov
                     WHEN 0 THEN '⬜'
             ELSE '✅'
-            END AS "Status"
+            END AS "Status",
+
+            fc03000.porta AS "Portaria"
 
             FROM
                 fc15100
@@ -138,7 +140,8 @@ app.get('/requisicoes', (req, res) => {
             fc15110.unidaprd,
             fc15100.qtfor,
             fc15110.itemid,
-            fc15100.qtaprov
+            fc15100.qtaprov,
+            fc03000.porta
 
             ORDER BY fc15110.itemid ASC;           
 
@@ -163,4 +166,5 @@ app.get('/requisicoes', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
