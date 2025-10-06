@@ -492,7 +492,6 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
             <strong>Quantidade:</strong> ${item['Quantidade']}  
             <strong>Quantidade de Potes:</strong> ${item['Quantidade Potes']}<br><br> 
             <strong>📦 Fórmula Manipulada:</strong><br>${componentesHtml}<br><br>
-            ${portaria ? `<strong>📜 Portaria:</strong> ${portaria}<br><br>` : ''}
             <strong>Bruto:</strong> R$ ${formattedBruto} 
             | <strong>Desconto:</strong> R$ ${formattedDesconto} 
             | <strong>Geral:</strong> R$ ${formattedGeral}
@@ -506,7 +505,6 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
 Fórmula Manipulada:
 ${componentesText}
 
-${portaria ? `Portaria: ${portaria}\n` : ''}
 
 ${desconto > 0 ? 
 `Total: R$ ${formattedBruto} | Total de Descontos: R$ ${formattedDesconto} | Total no PIX: R$ ${formattedGeral}` : 
@@ -741,6 +739,7 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
+
 
 
 
