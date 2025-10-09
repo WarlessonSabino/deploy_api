@@ -353,20 +353,27 @@
                 acc[numero].detalhes.push(item);
                 return acc;
             }, {});
-            Object.keys(groupedData).forEach(numero => {
-                const { status, detalhes } = groupedData[numero];
-                const option = document.createElement('div');
-                option.innerHTML = `
-                    <label>
-                        <input type="checkbox" class="orcamento-checkbox"
-                            data-numero="${numero}"
-                            data-status="${status}"
-                            data-detalhes="${encodeURIComponent(JSON.stringify(detalhes))}">
-                        ${numero}  ${status}
-                    </label>
-                `;
-                optionsContainer.appendChild(option);
-            });
+            Object.keys(groupedData)
+                .sort((a, b) => {
+                    // extrai o último número após o último hífen e compara numericamente
+                    const numA = parseInt(a.split('-').pop().trim());
+                    const numB = parseInt(b.split('-').pop().trim());
+                    return numA - numB;
+                })
+                .forEach(numero => {
+                    const { status, detalhes } = groupedData[numero];
+                    const option = document.createElement('div');
+                    option.innerHTML = `
+                        <label>
+                            <input type="checkbox" class="orcamento-checkbox"
+                                data-numero="${numero}"
+                                data-status="${status}"
+                                data-detalhes="${encodeURIComponent(JSON.stringify(detalhes))}">
+                            ${numero}  ${status}
+                        </label>
+                    `;
+                    optionsContainer.appendChild(option);
+                });
             const selectAllCheckbox = document.getElementById('selectAll');
             selectAllCheckbox.checked = false;
             selectAllCheckbox.addEventListener('change', () => {
@@ -739,6 +746,7 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
+
 
 
 
