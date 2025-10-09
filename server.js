@@ -101,7 +101,11 @@ app.get('/requisicoes', (req, res) => {
             ELSE '✅'
             END AS "Status",
 
-            fc03000.porta AS "Portaria"
+            
+            CASE 
+              WHEN fc03000.cdpro IN (3721, 50260) THEN NULL 
+              ELSE fc03000.porta 
+            END AS "Portaria"
 
             FROM
                 fc15100
@@ -128,35 +132,6 @@ app.get('/requisicoes', (req, res) => {
             AND 
                 fc15110.indelicmp <> 'S'      
 
-            GROUP BY
-            
-                (fc15100.cdfil || ' - ' || fc15100.nrorc || ' - ' || fc15100.serieo),
-            
-            
-                fc15100.prcobr,
-                fc15100.vrdsc,
-            
-            
-                fc15100.volume,
-                fc15100.qtcont,
-                fc15100.tpformafarma,
-                fc15100.univol,
-                fc15100.qtfor,
-                fc15100.qtaprov,
-                fc15110.quant,
-                fc15110.quanthp,
-                fc15110.unida,
-                fc15110.unihp,
-                fc15110.unidaprd,
-                fc15110.itemid,
-                fc03000.porta,
-            
-            
-                fc15110.descr,
-                fc03200.descrprd,
-                fc03000.descrprd,
-                fc15110.cdpro,
-                fc15110.cdprin
 
             ORDER BY fc15110.itemid ASC;           
 
@@ -181,6 +156,7 @@ app.get('/requisicoes', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
