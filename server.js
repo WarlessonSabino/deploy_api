@@ -77,10 +77,13 @@ app.get('/requisicoes', (req, res) => {
             END AS "Quantidade Potes",     
 
             CASE
-                WHEN fc03000.descrprd <> fc15110.descr THEN fc15110.descr
-                WHEN fc03000.descrprd is null THEN fc15110.descr
-                ELSE fc03000.descrprd
+              WHEN TRIM(fc15110.descr) NOT IN (TRIM(fc03200.descrprd), TRIM(fc03000.descrprd))
+                   THEN fc15110.descr
+              WHEN fc15110.cdpro <> fc15110.cdprin
+                   THEN fc03200.descrprd
+              ELSE fc03000.descrprd
             END AS "Componentes da Fórmula",
+
 
             ROUND(
                 CASE 
@@ -110,6 +113,9 @@ app.get('/requisicoes', (req, res) => {
             LEFT JOIN
             fc03000 on fc03000.cdpro = fc15110.cdprin
 
+            LEFT JOIN
+            fc03200 on fc03200.cdsin = fc15110.cdpro
+
 
             WHERE
                 fc15100.nrorc = ?
@@ -122,26 +128,35 @@ app.get('/requisicoes', (req, res) => {
             AND 
                 fc15110.indelicmp <> 'S'      
 
-            GROUP BY 
-            fc15100.cdfil || ' - ' || fc15100.nrorc || ' - ' || fc15100.serieo,
-            fc15100.prcobr,
-            fc15100.vrdsc,
-            fc15100.volume,
-            fc15100.qtcont,
-            fc15100.tpformafarma,
-            fc15100.univol,
-            fc15110.quant,
-            fc15110.quanthp, 
-            fc03000.descrprd,
-            fc15110.descr,
-            fc15110.descr,
-            fc15110.unida, 
-            fc15110.unihp, 
-            fc15110.unidaprd,
-            fc15100.qtfor,
-            fc15110.itemid,
-            fc15100.qtaprov,
-            fc03000.porta
+            GROUP BY
+            
+                (fc15100.cdfil || ' - ' || fc15100.nrorc || ' - ' || fc15100.serieo),
+            
+            
+                fc15100.prcobr,
+                fc15100.vrdsc,
+            
+            
+                fc15100.volume,
+                fc15100.qtcont,
+                fc15100.tpformafarma,
+                fc15100.univol,
+                fc15100.qtfor,
+                fc15100.qtaprov,
+                fc15110.quant,
+                fc15110.quanthp,
+                fc15110.unida,
+                fc15110.unihp,
+                fc15110.unidaprd,
+                fc15110.itemid,
+                fc03000.porta,
+            
+            
+                fc15110.descr,
+                fc03200.descrprd,
+                fc03000.descrprd,
+                fc15110.cdpro,
+                fc15110.cdprin
 
             ORDER BY fc15110.itemid ASC;           
 
@@ -166,5 +181,6 @@ app.get('/requisicoes', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
