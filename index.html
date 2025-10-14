@@ -521,17 +521,39 @@ ${desconto > 0 ?
 `;
     });
 
-    // 🔔 Se tiver Portaria, exibe aviso com opção de remover
+// 🔔 Se tiver Portaria, exibe aviso com opção de remover
     if (temPortaria && maiorValidade > 0) {
         const avisoDiv = document.createElement('div');
         avisoDiv.className = 'message';
-        avisoDiv.style.background = '#fff3cd';
-        avisoDiv.style.borderLeft = '5px solid #ffc107';
+        avisoDiv.style.cssText = `
+            background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.15);
+        `;
         avisoDiv.innerHTML = `
-            <strong>⚠️ Esse orçamento possui um ativo controlado (${maiorValidade} dias de validade).</strong><br>
-            Deseja remover o aviso da mensagem copiada?<br><br>
-            <button id="keepWarning" style="background:#28a745;color:#fff;padding:6px 12px;border:none;border-radius:4px;margin-right:10px;cursor:pointer;">Manter Aviso</button>
-            <button id="removeWarning" style="background:#dc3545;color:#fff;padding:6px 12px;border:none;border-radius:4px;cursor:pointer;">Remover Aviso</button>
+            <div style="display: flex; align-items: start; gap: 12px; margin-bottom: 16px;">
+                <span style="font-size: 28px; line-height: 1;">⚠️</span>
+                <div style="flex: 1;">
+                    <strong style="font-size: 16px; color: #856404; display: block; margin-bottom: 8px;">
+                        Ativo Controlado Detectado
+                    </strong>
+                    <p style="margin: 0; color: #856404; font-size: 14px; line-height: 1.5;">
+                        Este orçamento contém medicamento de controle especial com <strong>${maiorValidade} dias de validade</strong>.
+                        O aviso será incluído na mensagem copiada. Deseja remover?
+                    </p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button id="keepWarning" style="background:#28a745;color:#fff;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,0.1);" onmouseover="this.style.background='#218838'" onmouseout="this.style.background='#28a745'">
+                    ✓ Manter Aviso
+                </button>
+                <button id="removeWarning" style="background:#dc3545;color:#fff;padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.2s;box-shadow:0 2px 4px rgba(0,0,0,0.1);" onmouseover="this.style.background='#c82333'" onmouseout="this.style.background='#dc3545'">
+                    ✗ Remover Aviso
+                </button>
+            </div>
         `;
         selectedContainer.prepend(avisoDiv);
 
@@ -539,15 +561,26 @@ ${desconto > 0 ?
         window.includeWarning = true;
 
         avisoDiv.querySelector('#removeWarning').onclick = () => {
-            avisoDiv.remove();
+            avisoDiv.style.transition = 'all 0.3s ease';
+            avisoDiv.style.opacity = '0';
+            avisoDiv.style.transform = 'translateY(-10px)';
+            setTimeout(() => {
+                avisoDiv.remove();
+            }, 300);
             window.includeWarning = false;
         };
 
         avisoDiv.querySelector('#keepWarning').onclick = () => {
-            avisoDiv.remove();
+            avisoDiv.style.transition = 'all 0.3s ease';
+            avisoDiv.style.opacity = '0';
+            avisoDiv.style.transform = 'translateY(-10px)';
+            setTimeout(() => {
+                avisoDiv.remove();
+            }, 300);
             window.includeWarning = true;
         };
     }
+
 
     // adiciona aviso no texto copiado, se não removido
     if (temPortaria && maiorValidade > 0 && (window.includeWarning ?? true)) {
@@ -742,6 +775,7 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
+
 
 
 
