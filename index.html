@@ -449,26 +449,31 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
         const formattedGeral = formatter.format(geral);
 
         // 🔍 Verifica o campo Portaria e define validade
-        const portaria = (item['Portaria'] || '').toUpperCase().trim();
         let validadeDias = 0;
-        if (/^C[1-5]$/.test(portaria)) {
+        let temPortaria = false;
+        
+        for (const det of detalhes) {
+          const portaria = (det['Portaria'] || '').toUpperCase().trim();
+          if (!portaria) continue;
+        
+          if (/^C[1-5]$/.test(portaria) || /^B[1-2]$/.test(portaria) || /^A[1-3]$/.test(portaria)) {
             validadeDias = 30;
             temPortaria = true;
-        } else if (/^B[1-2]$/.test(portaria)) {
-            validadeDias = 30;
-            temPortaria = true;
-        } else if (/^A[1-3]$/.test(portaria)) {
-            validadeDias = 30;
-            temPortaria = true;
-        } else if (portaria === 'AM') {
+            break; // já encontrou, não precisa continuar
+          }
+        
+          if (portaria === 'AM') {
             validadeDias = 10;
             temPortaria = true;
+            break;
+          }
         }
-        if (validadeDias > 0) {
-            // usa o menor prazo encontrado (10 dias tem prioridade)
-            if (maiorValidade === 0 || validadeDias < maiorValidade) {
-                maiorValidade = validadeDias;
-            }
+        
+        // usa o menor prazo encontrado (10 dias tem prioridade)
+        if (temPortaria) {
+          if (maiorValidade === 0 || validadeDias < maiorValidade) {
+            maiorValidade = validadeDias;
+          }
         }
 
         const message = document.createElement('div');
@@ -746,6 +751,7 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
+
 
 
 
