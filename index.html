@@ -253,7 +253,8 @@
       }
 
       try {
-        const response = await fetch(\`https://pharmesdev.ddns.net/consulta_orçamento/api/node/requisicoes?nrorc=\${encodeURIComponent(nrorc)}&cdfil=\${encodeURIComponent(cdfil)}\`);
+        const url = `https://pharmesdev.ddns.net/consulta_orçamento/api/node/requisicoes?nrorc=${nrorc}&cdfil=${cdfil}`;
+        const response = await fetch(url);
         if (!response.ok) throw new Error('Erro ao buscar os dados');
         const data = await response.json();
         renderResults(data);
@@ -657,3 +658,4 @@ Se for mais prático, você também pode enviar a receita digitalmente, desde qu
   </script>
 </body>
 </html>
+
