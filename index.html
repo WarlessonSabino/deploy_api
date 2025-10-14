@@ -1,661 +1,753 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Consulta de Orçamentos</title>
-  <style>
-    body {
-      font-family: 'Roboto', Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f4f6f9;
-      color: #333;
-      line-height: 1.6;
-    }
-    .container {
-      max-width: 700px;
-      margin: 40px auto;
-      padding: 20px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    h1 {
-      font-size: 24px;
-      color: #007bff;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .form-group { margin-bottom: 20px; }
-    .form-group label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 8px;
-      color: #555;
-    }
-    .form-group input, .form-group select {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      box-sizing: border-box;
-      transition: border-color 0.2s;
-    }
-    .form-group input:focus, .form-group select:focus {
-      border-color: #007bff;
-      outline: none;
-    }
-    button {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      color: white;
-      background: #007bff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover { background: #0056b3; }
-    .results { margin-top: 30px; }
-    .results h2 {
-      font-size: 20px;
-      color: #007bff;
-      border-bottom: 2px solid #007bff;
-      padding-bottom: 8px;
-      margin-bottom: 20px;
-    }
-    #selectedOrcamentos { margin-top: 20px; }
-    .message {
-      border: 1px solid #ddd;
-      background: #f9f9f9;
-      border-radius: 4px;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
-    .totals {
-      text-align: center;
-      font-size: 18px;
-      color: #333;
-      margin-top: 30px;
-    }
-    .totals span { font-weight: bold; color: #007bff; }
-    #copyButton { margin-top: 20px; background: #28a745; }
-    #copyButton:hover { background: #218838; }
-
-    /* Calculadora */
-    #calculator {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #fff;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      cursor: pointer;
-      transition: width 0.3s ease, height 0.3s ease, border-radius 0.3s ease;
-      overflow: hidden;
-    }
-    #calculator img { width: 30px; height: 30px; }
-    #calculator.expanded {
-      width: 320px;
-      height: 550px;
-      border-radius: 8px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: start;
-      cursor: default;
-    }
-    #calculator.expanded img { display: none; }
-    .calculator-content { display: none; width: 100%; }
-    #calculator.expanded .calculator-content { display: block; }
-    .calculator-header {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      margin-bottom: 10px;
-      width: 100%;
-    }
-    .calculator-buttons { display: flex; align-items: center; gap: 8px; }
-    #addRecommendation {
-      background: #ff9800; color: #fff; font-weight: bold; border: none;
-      border-radius: 4px; width: 30px; height: 30px; font-size: 16px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; transition: background 0.2s;
-    }
-    #addRecommendation:hover { background: #ffb84d; }
-    #closeCalculator {
-      background: #dc3545; color: #fff; border: none; border-radius: 4px; width: 30px; height: 30px;
-      font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s;
-    }
-    #closeCalculator:hover { background: #c82333; }
-    .calculator-action-buttons { display: flex; gap: 10px; margin-top: 15px; }
-    .calculator-action-buttons button { flex: 1; padding: 10px; font-size: 14px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Orçamentos</title>
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f6f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 24px;
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #555;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            color: white;
+            background: #007bff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .results {
+            margin-top: 30px;
+        }
+        .results h2 {
+            font-size: 20px;
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+        #selectedOrcamentos {
+            margin-top: 20px;
+        }
+        .message {
+            border: 1px solid #ddd;
+            background: #f9f9f9;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .totals {
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+            margin-top: 30px;
+        }
+        .totals span {
+            font-weight: bold;
+            color: #007bff;
+        }
+        #copyButton {
+            margin-top: 20px;
+            background: #28a745;
+        }
+        #copyButton:hover {
+            background: #218838;
+        }
+        #calculator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #fff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: width 0.3s ease, height 0.3s ease, border-radius 0.3s ease;
+            overflow: hidden;
+        }
+        #calculator img {
+            width: 30px;
+            height: 30px;
+        }
+        #calculator.expanded {
+            width: 320px;
+            height: 550px;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: start;
+            cursor: default;
+        }
+        #calculator.expanded img {
+            display: none;
+        }
+        .calculator-content {
+            display: none;
+            width: 100%;
+        }
+        #calculator.expanded .calculator-content {
+            display: block;
+        }
+        
+        .calculator-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        
+        .calculator-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            flex: 1;
+            text-align: center;
+            color: #333;
+        }
+        
+        .calculator-buttons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        #addRecommendation {
+            background: #ff9800;
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        
+        #addRecommendation:hover {
+            background: #ffb84d;
+        }
+        
+        #closeCalculator {
+            background: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        
+        #closeCalculator:hover {
+            background: #c82333;
+        }
+        
+        .calculator-action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .calculator-action-buttons button {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Pharmes - Consulta Orçamentos</h1>
-    <div class="form-group">
-      <label for="cdfil">Filial</label>
-      <input type="text" id="cdfil" placeholder="Digite o código da filial"/>
-    </div>
-    <div class="form-group">
-      <label for="nrorc">Número do Orçamento</label>
-      <input type="text" id="nrorc" placeholder="Digite o número do orçamento"/>
-    </div>
-    <button id="fetchData">Consultar</button>
-
-    <div class="results" id="results" style="display:none;">
-      <h2>Resultados</h2>
-      <div>
-        <label><input type="checkbox" id="selectAll"/> Selecionar Todos</label>
-      </div>
-      <div id="options"></div>
-    </div>
-
-    <div id="selectedOrcamentos"></div>
-
-    <div class="totals" id="totals">
-      <div>💰 Total: <span>R$ 0.00</span></div>
-      <div>🎉 Total Desconto: <span>R$ 0.00</span></div>
-      <div>💲 Total no PIX: <span>R$ 0.00</span></div>
-    </div>
-
-    <button id="copyButton" style="display:none;">Copiar Orçamentos</button>
-  </div>
-
-  <!-- Calculadora -->
-  <div id="calculator">
-    <img id="calculatorIcon" src="imagens/calculator.svg" alt="Abrir Calculadora"/>
-    <div class="calculator-content">
-      <div class="calculator-header">
-        <div class="calculator-buttons">
-          <button id="addRecommendation" title="Adicionar sugestão ao preview">💡</button>
-          <button id="closeCalculator" title="Fechar calculadora">×</button>
+    <div class="container">
+        <h1>Pharmes - Consulta Orçamentos</h1>
+        <div class="form-group">
+            <label for="cdfil">Filial</label>
+            <input type="text" id="cdfil" placeholder="Digite o código da filial">
         </div>
-      </div>
+        <div class="form-group">
+            <label for="nrorc">Número do Orçamento</label>
+            <input type="text" id="nrorc" placeholder="Digite o número do orçamento">
+        </div>
+        <button id="fetchData">Consultar</button>
 
-      <div class="form-group">
-        <label style="font-size:18px; font-weight:600; display:block; margin-bottom:15px; color:#333;">Calculadora de Preço</label>
-        <label for="currentTreatment">Tempo de Tratamento Atual:</label>
-        <select id="currentTreatment">
-          <option value="30">30 dias</option>
-          <option value="60">60 dias</option>
-          <option value="90">90 dias</option>
-          <option value="120">120 dias</option>
-        </select>
-      </div>
+        <div class="results" id="results" style="display: none;">
+            <h2>Resultados</h2>
+            <div>
+                <label>
+                    <input type="checkbox" id="selectAll"> Selecionar Todos
+                </label>
+            </div>
+            <div id="options"></div>
+        </div>
 
-      <div class="form-group">
-        <label for="simulateFor">Simular para:</label>
-        <select id="simulateFor">
-          <option value="30">30 dias</option>
-          <option value="60">60 dias</option>
-          <option value="90">90 dias</option>
-          <option value="120">120 dias</option>
-        </select>
-      </div>
+        <div id="selectedOrcamentos"></div>
 
-      <div class="calculator-action-buttons">
-        <button id="calculatePrice">Calcular</button>
-      </div>
+        <div class="totals" id="totals">
+            <div>💰 Total: <span>R$ 0.00</span></div>
+            <div>🎉 Total Desconto: <span>R$ 0.00</span></div>
+            <div>💲 Total no PIX: <span>R$ 0.00</span></div>
+        </div>
 
-      <div id="calculationResult"></div>
-      <div id="recommendationPreview" style="margin-top:12px; font-style:italic; color:#007bff;"></div>
+        <button id="copyButton" style="display: none;">Copiar Orçamentos</button>
     </div>
-  </div>
 
-  <script>
-    function formatQuantidadeDosagem(valor) {
-      let match = valor.match(/^([\\d.]+)\\s*(\\S+.*)$/);
-      if (!match) return valor;
-      let numero = parseFloat(match[1]);
-      let unidade = match[2].trim();
-      if (unidade === "%" && Number.isInteger(numero)) {
-        return \`\${numero}\${unidade}\`;
-      }
-      if (Number.isInteger(numero)) {
-        return \`\${numero} \${unidade}\`;
-      } else {
-        return \`\${numero.toString().replace(/\\.?0+$/, '')} \${unidade}\`;
-      }
-    }
+    <div id="calculator">
+        <img id="calculatorIcon" src="imagens/calculator.svg" alt="Abrir Calculadora">
+        <div class="calculator-content">
+            <div class="calculator-header">
+                <div class="calculator-buttons">
+                    <button id="addRecommendation" title="Adicionar sugestão ao preview">💡</button>
+                    <button id="closeCalculator" title="Fechar calculadora">×</button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label style="font-size: 18px; font-weight: 600; display: block; margin-bottom: 15px; color: #333;">Calculadora de Preço</label>
+                <label for="currentTreatment">Tempo de Tratamento Atual:</label>
+                <select id="currentTreatment">
+                    <option value="30">30 dias</option>
+                    <option value="60">60 dias</option>
+                    <option value="90">90 dias</option>
+                    <option value="120">120 dias</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="simulateFor">Simular para:</label>
+                <select id="simulateFor">
+                    <option value="30">30 dias</option>
+                    <option value="60">60 dias</option>
+                    <option value="90">90 dias</option>
+                    <option value="120">120 dias</option>
+                </select>
+            </div>
+            
+            <div class="calculator-action-buttons">
+                <button id="calculatePrice">Calcular</button>
+            </div>
+            
+            <div id="calculationResult"></div>
+            <div id="recommendationPreview" style="margin-top:12px; font-style:italic; color:#007bff;"></div>
+        </div>
+    </div>
 
-    const formatter = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 });
+    <script>
+        function formatQuantidadeDosagem(valor) {
+            let match = valor.match(/^([\d.]+)\s*(\S+.*)$/);
+            if (!match) return valor;
+            let numero = parseFloat(match[1]);
+            let unidade = match[2].trim();
+            if (unidade === "%" && Number.isInteger(numero)) {
+                return `${numero}${unidade}`;
+            }
+            if (Number.isInteger(numero)) {
+                return `${numero} ${unidade}`;
+            } else {
+                return `${numero.toString().replace(/\.?0+$/, '')} ${unidade}`;
+            }
+        }
 
-    document.getElementById('fetchData').addEventListener('click', async () => {
-      const cdfil = document.getElementById('cdfil').value;
-      const nrorc = document.getElementById('nrorc').value;
+        const formatter = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2 });
 
-      document.getElementById('options').innerHTML = '';
-      document.getElementById('selectedOrcamentos').innerHTML = '';
-      document.getElementById('totals').innerHTML = \`
-        <div>💰 Total: <span>R$ 0.00</span></div>
-        <div>🎉 Total Desconto: <span>R$ 0.00</span></div>
-        <div>💲 Total no PIX: <span>R$ 0.00</span></div>
-      \`;
-      document.getElementById('results').style.display = 'none';
-      document.getElementById('copyButton').style.display = 'none';
+        document.getElementById('fetchData').addEventListener('click', async () => {
+            const cdfil = document.getElementById('cdfil').value;
+            const nrorc = document.getElementById('nrorc').value;
+            document.getElementById('options').innerHTML = '';
+            document.getElementById('selectedOrcamentos').innerHTML = '';
+            document.getElementById('totals').innerHTML = `
+                <div>💰 Total: <span>R$ 0.00</span></div>
+                <div>🎉 Total Desconto: <span>R$ 0.00</span></div>
+                <div>💲 Total no PIX: <span>R$ 0.00</span></div>
+            `;
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('copyButton').style.display = 'none';
+            if (!cdfil || !nrorc) {
+                alert('Por favor, preencha os campos de filial e número do orçamento.');
+                return;
+            }
+            try { 
 
-      if (!cdfil || !nrorc) {
-        alert('Por favor, preencha os campos de filial e número do orçamento.');
-        return;
-      }
-
-      try {
-        const url = `https://pharmesdev.ddns.net/consulta_orçamento/api/node/requisicoes?nrorc=${nrorc}&cdfil=${cdfil}`;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Erro ao buscar os dados');
-        const data = await response.json();
-        renderResults(data);
-        document.getElementById('results').style.display = 'block';
-        document.getElementById('copyButton').style.display = 'block';
-      } catch (error) {
-        alert(error.message);
-      }
-    });
-
-    function renderResults(data) {
-      const optionsContainer = document.getElementById('options');
-      optionsContainer.innerHTML = '';
-
-      const groupedData = data.reduce((acc, item) => {
-        const numero = item['N° Orçamento'];
-        const status = item['Status'];
-        if (!acc[numero]) acc[numero] = { status, detalhes: [] };
-        acc[numero].detalhes.push(item);
-        return acc;
-      }, {});
-
-      Object.keys(groupedData)
-        .sort((a, b) => {
-          const numA = parseInt(a.split('-').pop().trim());
-          const numB = parseInt(b.split('-').pop().trim());
-          return numA - numB;
-        })
-        .forEach(numero => {
-          const { status, detalhes } = groupedData[numero];
-          const option = document.createElement('div');
-          option.innerHTML = \`
-            <label>
-              <input type="checkbox" class="orcamento-checkbox"
-                data-numero="\${numero}"
-                data-status="\${status}"
-                data-detalhes="\${encodeURIComponent(JSON.stringify(detalhes))}">
-              \${numero}  \${status}
-            </label>
-          \`;
-          optionsContainer.appendChild(option);
+                const response = await fetch(`https://pharmesdev.ddns.net/consulta_orçamento/api/node/requisicoes?nrorc=${nrorc}&cdfil=${cdfil}`);
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar os dados');
+                }
+                const data = await response.json();
+                renderResults(data);
+                document.getElementById('results').style.display = 'block';
+                document.getElementById('copyButton').style.display = 'block';
+            } catch (error) {
+                alert(error.message);
+            }
         });
 
-      const selectAllCheckbox = document.getElementById('selectAll');
-      selectAllCheckbox.checked = false;
-      selectAllCheckbox.onchange = () => {
-        const isChecked = selectAllCheckbox.checked;
-        document.querySelectorAll('.orcamento-checkbox').forEach(checkbox => {
-          checkbox.checked = isChecked;
-          checkbox.dispatchEvent(new Event('change'));
-        });
-      };
+        function renderResults(data) {
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            const groupedData = data.reduce((acc, item) => {
+                const numero = item['N° Orçamento'];
+                const status = item['Status'];
+                if (!acc[numero]) {
+                    acc[numero] = { status, detalhes: [] };
+                }
+                acc[numero].detalhes.push(item);
+                return acc;
+            }, {});
+            Object.keys(groupedData)
+                .sort((a, b) => {
+                    // extrai o último número após o último hífen e compara numericamente
+                    const numA = parseInt(a.split('-').pop().trim());
+                    const numB = parseInt(b.split('-').pop().trim());
+                    return numA - numB;
+                })
+                .forEach(numero => {
+                    const { status, detalhes } = groupedData[numero];
+                    const option = document.createElement('div');
+                    option.innerHTML = `
+                        <label>
+                            <input type="checkbox" class="orcamento-checkbox"
+                                data-numero="${numero}"
+                                data-status="${status}"
+                                data-detalhes="${encodeURIComponent(JSON.stringify(detalhes))}">
+                            ${numero}  ${status}
+                        </label>
+                    `;
+                    optionsContainer.appendChild(option);
+                });
+            const selectAllCheckbox = document.getElementById('selectAll');
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.addEventListener('change', () => {
+                const isChecked = selectAllCheckbox.checked;
+                document.querySelectorAll('.orcamento-checkbox').forEach(checkbox => {
+                    checkbox.checked = isChecked;
+                    checkbox.dispatchEvent(new Event('change'));
+                });
+            });
+            document.querySelectorAll('.orcamento-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelected);
+            });
+        }
 
-      document.querySelectorAll('.orcamento-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', updateSelected);
-      });
-    }
-
-    function updateSelected() {
-      const selectedContainer = document.getElementById('selectedOrcamentos');
-      const totalsContainer = document.getElementById('totals');
-      selectedContainer.innerHTML = '';
-
-      let totalBruto = 0;
-      let totalDesconto = 0;
-      let totalGeral = 0;
-
-      let copiedText = '';
-      const introMessage = `
+function updateSelected() {
+    let recommendationText = '';
+    const selectedContainer = document.getElementById('selectedOrcamentos');
+    const totalsContainer = document.getElementById('totals');
+    selectedContainer.innerHTML = '';
+    let totalBruto = 0;
+    let totalDesconto = 0;
+    let totalGeral = 0;
+    let copiedText = '';
+    const introMessage = `
 ✨ Obrigado por escolher nossa farmácia de manipulação! ✨
 
 Fiz seu orçamento com todo cuidado e atenção que você merece!
 
 `;
-      const conclusionMessage = `
+    const conclusionMessage = `
 Assim que aprovado, nossa equipe começa imediatamente a manipular sua fórmula com todo o cuidado que você merece.
 
 Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e bem-estar! 
 
 `;
 
-      copiedText += introMessage;
+    copiedText += introMessage;
 
-      // Exibe recomendação no preview (se houver)
-      if (window.lastRecommendation) {
-        const old = document.getElementById('recommendationInPreview');
+    if (window.lastRecommendation) {
+        let old = document.getElementById('recommendationInPreview');
         if (old) old.remove();
-        const recomendDiv = document.createElement('div');
+
+        let recomendDiv = document.createElement('div');
         recomendDiv.id = 'recommendationInPreview';
         recomendDiv.className = 'message';
         recomendDiv.style.background = '#fffbe6';
         recomendDiv.innerHTML = `<strong>💡 Sugestão personalizada:</strong><br>${window.lastRecommendation}`;
         selectedContainer.appendChild(recomendDiv);
-      }
+    }
 
-      // Flags de controlado
-      let maiorValidade = 0;
-      let temPortaria = false;
+    let maiorValidade = 0; // armazenar o menor prazo (10 ou 30 dias)
+    let temPortaria = false; // flag de controle
 
-      // Loop orçamentos selecionados
-      document.querySelectorAll('.orcamento-checkbox:checked').forEach(checkbox => {
+    document.querySelectorAll('.orcamento-checkbox:checked').forEach(checkbox => {
         const numero = checkbox.getAttribute('data-numero');
         const detalhes = JSON.parse(decodeURIComponent(checkbox.getAttribute('data-detalhes')));
-        const formattedNumero = (numero || '').replace(/\\s+/g, '');
-
+        const formattedNumero = (numero || '').replace(/\s+/g, '');
         const componentesArray = detalhes.map(item => {
-          const quantidadeFormatada = formatQuantidadeDosagem(item['Quantidade Dosagem']);
-          return \`\${item['Componentes da Fórmula']}: \${quantidadeFormatada}\`;
+            const quantidadeFormatada = formatQuantidadeDosagem(item['Quantidade Dosagem']);
+            return `${item['Componentes da Fórmula']}: ${quantidadeFormatada}`;
         });
         const componentesHtml = componentesArray.join('<br>');
-        const componentesText = componentesArray.join('\\n');
-
+        const componentesText = componentesArray.join('\n');
         const item = detalhes[0];
         const bruto = parseFloat(item['Valor_Bruto']);
         const desconto = parseFloat(item['Valor_Desconto']);
         const geral = parseFloat(item['Valor a Pagar']);
-
         totalBruto += bruto;
         totalDesconto += desconto;
         totalGeral += geral;
-
         const formattedBruto = formatter.format(bruto);
         const formattedDesconto = formatter.format(desconto);
         const formattedGeral = formatter.format(geral);
 
-        // Detecta portaria/validade (menor prazo encontrado)
+
+        let validadeDias = 0;
+        
         for (const det of detalhes) {
           const portaria = (det['Portaria'] || '').toUpperCase().trim();
           if (!portaria) continue;
+        
           if (/^C[1-5]$/.test(portaria) || /^B[1-2]$/.test(portaria) || /^A[1-3]$/.test(portaria)) {
+            validadeDias = 30;
             temPortaria = true;
-            maiorValidade = (maiorValidade === 0 ? 30 : Math.min(maiorValidade, 30));
+            break;
           }
+        
           if (portaria === 'AM') {
+            validadeDias = 10;
             temPortaria = true;
-            maiorValidade = (maiorValidade === 0 ? 10 : Math.min(maiorValidade, 10));
+            break;
+          }
+        }
+        
+        // usa o menor prazo encontrado (10 dias tem prioridade)
+        if (temPortaria) {
+          if (maiorValidade === 0 || validadeDias < maiorValidade) {
+            maiorValidade = validadeDias;
           }
         }
 
-        // Card no preview
+
         const message = document.createElement('div');
         message.classList.add('message');
         message.style.position = "relative";
 
-        const closeBtn = document.createElement('span');
+        let closeBtn = document.createElement('span');
         closeBtn.textContent = '✖';
         closeBtn.title = 'Remover este orçamento';
-        closeBtn.style.cssText = 'position:absolute;top:8px;right:12px;cursor:pointer;font-weight:bold;color:#dc3545;';
+        closeBtn.style.position = 'absolute';
+        closeBtn.style.top = '8px';
+        closeBtn.style.right = '12px';
+        closeBtn.style.cursor = 'pointer';
+        closeBtn.style.fontWeight = 'bold';
+        closeBtn.style.color = '#dc3545';
         closeBtn.onclick = () => {
-          const check = document.querySelector(\`.orcamento-checkbox[data-numero="\${numero}"]\`);
-          if (check) { check.checked = false; check.dispatchEvent(new Event('change')); }
+            const check = document.querySelector(`.orcamento-checkbox[data-numero="${numero}"]`);
+            if (check) {
+                check.checked = false;
+                check.dispatchEvent(new Event('change'));
+            }
         };
         message.appendChild(closeBtn);
 
-        message.insertAdjacentHTML("beforeend", \`
-          <strong>📝 Orçamento N:</strong> \${numero}<br><br>
-          <strong>Fórmula Farmacêutica:</strong> \${item['Fórmula Farmacêutica']}<br>
-          <strong>Quantidade:</strong> \${item['Quantidade']}  
-          <strong>Quantidade de Potes:</strong> \${item['Quantidade Potes']}<br><br> 
-          <strong>📦 Fórmula Manipulada:</strong><br>\${componentesHtml}<br><br>
-          <strong>Bruto:</strong> R$ \${formattedBruto} 
-          | <strong>Desconto:</strong> R$ \${formattedDesconto} 
-          | <strong>Geral:</strong> R$ \${formattedGeral}
-        \`);
+        message.insertAdjacentHTML("beforeend", `
+            <strong>📝 Orçamento N:</strong> ${numero}<br><br>
+            <strong>Fórmula Farmacêutica:</strong> ${item['Fórmula Farmacêutica']}<br>
+            <strong>Quantidade:</strong> ${item['Quantidade']}  
+            <strong>Quantidade de Potes:</strong> ${item['Quantidade Potes']}<br><br> 
+            <strong>📦 Fórmula Manipulada:</strong><br>${componentesHtml}<br><br>
+            <strong>Bruto:</strong> R$ ${formattedBruto} 
+            | <strong>Desconto:</strong> R$ ${formattedDesconto} 
+            | <strong>Geral:</strong> R$ ${formattedGeral}
+        `);
+
         selectedContainer.appendChild(message);
 
-        // Bloco de texto desse orçamento no copiado
-        copiedText += \`
-📝 ORC:\${formattedNumero} | Quantidade: \${item['Quantidade']} | Potes: \${item['Quantidade Potes']}
+        copiedText += `
+📝 ORC:${formattedNumero} | Quantidade: ${item['Quantidade']} | Potes: ${item['Quantidade Potes']}
 
 Fórmula Manipulada:
-\${componentesText}
+${componentesText}
 
 
-\${desconto > 0 ? 
-\`Total: R$ \${formattedBruto} | Total de Descontos: R$ \${formattedDesconto} | Total no PIX: R$ \${formattedGeral}\` : 
-\`Total no PIX: R$ \${formattedGeral}\`}
+${desconto > 0 ? 
+`Total: R$ ${formattedBruto} | Total de Descontos: R$ ${formattedDesconto} | Total no PIX: R$ ${formattedGeral}` : 
+`Total no PIX: R$ ${formattedGeral}`}
 
-\`;
-      });
+`;
+    });
 
-      // Sempre acrescenta os Totais Consolidados no texto copiado
-      const consolidados = totalDesconto > 0
-        ? `
+    if (totalDesconto > 0) {
+        copiedText += `
 Totais Consolidados:
 💰 TOTAL: R$ ${formatter.format(totalBruto)}
 🎉 TOTAL DE DESCONTOS: R$ ${formatter.format(totalDesconto)}
 💲 Total no PIX: R$ ${formatter.format(totalGeral)}
 
-`
-        : `
+`;
+    } else {
+        copiedText += `
 Totais Consolidados:
 💰 TOTAL: R$ ${formatter.format(totalBruto)}
 💲 Total no PIX: R$ ${formatter.format(totalGeral)}
 
 `;
-      copiedText += consolidados;
+    }
 
-      // Aviso de controlado
-      if (temPortaria && maiorValidade > 0) {
+    if (temPortaria && maiorValidade > 0) {
         copiedText += `
 ⚠️ Este é um medicamento de controle especial, por isso precisamos da receita original dentro da validade de ${maiorValidade} dias para dar início à manipulação.
 Se for mais prático, você também pode enviar a receita digitalmente, desde que possua QR Code ativo ou assinatura digital válida.
 
 `;
-      }
-
-      // Conclusão
-      copiedText += conclusionMessage;
-
-      // Totais no preview (tela)
-      totalsContainer.innerHTML = \`
-        <div>💰 Total: <span>R$ \${formatter.format(totalBruto)}</span></div>
-        <div>🎉 Total Desconto: <span>R$ \${formatter.format(totalDesconto)}</span></div>
-        <div>💲 Total no PIX: <span>R$ \${formatter.format(totalGeral)}</span></div>
-      \`;
-
-      // ======= COPIAR (robusto) =======
-      const copyBtn = document.getElementById('copyButton');
-      copyBtn.onclick = () => {
-        let finalText = copiedText;
-        if (window.lastRecommendation) {
-          finalText = finalText.replace(
-            conclusionMessage,
-            \`💡 Sugestão Exclusiva: \${window.lastRecommendation}\\n\\n\${conclusionMessage}\`
-          );
-        }
-        // Normaliza EOLs e trim
-        finalText = finalText.replace(/\\r\\n/g, '\\n').trim();
-
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(finalText)
-            .then(() => alert('✅ Orçamento copiado com sucesso!'))
-            .catch(() => fallbackCopy(finalText));
-        } else {
-          fallbackCopy(finalText);
-        }
-      };
-
-      function fallbackCopy(text) {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.focus();
-        ta.select();
-        try {
-          document.execCommand('copy');
-          alert('✅ Orçamento copiado com sucesso!');
-        } catch (e) {
-          alert('❌ Não foi possível copiar automaticamente. Tente copiar manualmente.');
-        }
-        document.body.removeChild(ta);
-      }
-      // ======= /COPIAR =======
     }
 
-    // Estado global da calculadora
-    let lastRecommendation = "";
-    let lastSimulateDias = 30;
-    let lastDesconto = 0;
-    let lastValor = 0;
+    copiedText += conclusionMessage;
 
-    // Abrir/fechar calculadora
-    document.getElementById('calculator').addEventListener('click', function (event) {
-      const calculator = document.getElementById('calculator');
-      if (!calculator.classList.contains('expanded')) {
-        calculator.classList.add('expanded');
-      }
-      event.stopPropagation();
-    });
-    document.getElementById('closeCalculator').addEventListener('click', function (event) {
-      document.getElementById('calculator').classList.remove('expanded');
-      event.stopPropagation();
-    });
+    totalsContainer.innerHTML = `
+        <div>💰 Total: <span>R$ ${formatter.format(totalBruto)}</span></div>
+        <div>🎉 Total Desconto: <span>R$ ${formatter.format(totalDesconto)}</span></div>
+        <div>💲 Total no PIX: <span>R$ ${formatter.format(totalGeral)}</span></div>
+    `;
 
-    // Calcular
-    document.getElementById('calculatePrice').addEventListener('click', () => {
-      const tempoTratamentoAtual = parseInt(document.getElementById('currentTreatment').value);
-      const simularPara = parseInt(document.getElementById('simulateFor').value);
-      lastSimulateDias = simularPara;
-
-      const totalGeral = parseFloat(
-        document.querySelectorAll('#totals span')[2].innerText
-          .replace('R$', '').replace(/\./g, '').replace(',', '.')
-      );
-      const numeroOrcamentos = document.querySelectorAll('.orcamento-checkbox:checked').length;
-
-      if (numeroOrcamentos === 0) {
-        alert('Selecione pelo menos um orçamento para calcular.');
-        return;
-      }
-
-      let multiplicador, multiplicadorMes;
-      if (tempoTratamentoAtual === 30) {
-        switch (simularPara) {
-          case 30: multiplicador = 1;    multiplicadorMes = 1; break;
-          case 60: multiplicador = 1.68; multiplicadorMes = 2; break;
-          case 90: multiplicador = 2.24; multiplicadorMes = 3; break;
-          case 120: multiplicador = 2.78; multiplicadorMes = 4; break;
+    document.getElementById('copyButton').onclick = () => {
+        let finalText = copiedText;
+        if (window.lastRecommendation) {
+            finalText = finalText.replace(
+                conclusionMessage,
+                `💡 Sugestão Exclusiva: ${window.lastRecommendation}\n\n${conclusionMessage}`
+            );
         }
-      } else if (tempoTratamentoAtual === 60) {
-        switch (simularPara) {
-          case 30: multiplicador = 0.57; multiplicadorMes = 1; break;
-          case 60: multiplicador = 1;    multiplicadorMes = 2; break;
-          case 90: multiplicador = 1.33; multiplicadorMes = 3; break;
-          case 120: multiplicador = 1.74; multiplicadorMes = 4; break;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(finalText).then(() => {
+                alert('Orçamentos copiados com sucesso!');
+            }).catch(err => {
+                console.error('Erro ao copiar para a área de transferência:', err);
+                alert('Não foi possível copiar os orçamentos automaticamente. Tente copiar manualmente.');
+            });
+        } else {
+            const textarea = document.createElement('textarea');
+            textarea.value = finalText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                alert('Orçamentos copiados com sucesso!');
+            } catch (err) {
+                console.error('Erro ao copiar usando execCommand:', err);
+                alert('Não foi possível copiar os orçamentos automaticamente. Tente copiar manualmente.');
+            }
+            document.body.removeChild(textarea);
         }
-      } else if (tempoTratamentoAtual === 90) {
-        switch (simularPara) {
-          case 30: multiplicador = 0.42; multiplicadorMes = 1; break;
-          case 60: multiplicador = 0.7;  multiplicadorMes = 2; break;
-          case 90: multiplicador = 1;    multiplicadorMes = 3; break;
-          case 120: multiplicador = 1.26; multiplicadorMes = 4; break;
-        }
-      } else if (tempoTratamentoAtual === 120) {
-        switch (simularPara) {
-          case 30: multiplicador = 0.32; multiplicadorMes = 1; break;
-          case 60: multiplicador = 0.60; multiplicadorMes = 2; break;
-          case 90: multiplicador = 0.80; multiplicadorMes = 3; break;
-          case 120: multiplicador = 1;    multiplicadorMes = 4; break;
-        }
-      }
+    };
+}
 
-      const precoCalculado = totalGeral * multiplicador / multiplicadorMes;
-      const valorTotal = precoCalculado * multiplicadorMes;
 
-      const descontoAplicado = (tempoTratamentoAtual === simularPara)
-        ? 0
-        : Math.abs((totalGeral * (simularPara / tempoTratamentoAtual)) - valorTotal);
+        let lastRecommendation = "";
+        let lastSimulateDias = 30;
+        let lastDesconto = 0;
+        let lastValor = 0;
 
-      const ticketMedioAtual = totalGeral / numeroOrcamentos;
-      const ticketMedioNovo = valorTotal / numeroOrcamentos;
-      const percentualAumento = ((ticketMedioNovo - ticketMedioAtual) / ticketMedioAtual) * 100;
+        document.getElementById('calculator').addEventListener('click', function (event) {
+            const calculator = document.getElementById('calculator');
+            if (!calculator.classList.contains('expanded')) {
+                calculator.classList.add('expanded');
+            }
+            event.stopPropagation();
+        });
 
-      const ticketMedioIcon = percentualAumento > 0 ? '📈' : (percentualAumento < 0 ? '📉' : '➡️');
+        document.getElementById('closeCalculator').addEventListener('click', function (event) {
+            document.getElementById('calculator').classList.remove('expanded');
+            event.stopPropagation();
+        });
 
-      document.getElementById('calculationResult').innerHTML = `
-        <p><strong>💰 Valor Total:</strong> R$ ${formatter.format(valorTotal.toFixed(2))}</p>
-        <p><strong>📆 Valor por Mês:</strong> R$ ${formatter.format(precoCalculado.toFixed(2))}</p>
-        ${descontoAplicado > 0 ? `<p><strong>🎉 Desconto Aplicado:</strong> R$ ${formatter.format(descontoAplicado.toFixed(2))}</p>` : ''}
-        <div style="margin-top:12px; padding:8px 12px; background:${percentualAumento > 0 ? '#d4edda' : percentualAumento < 0 ? '#f8d7da' : '#e9ecef'}; border-radius:6px; border-left:3px solid ${percentualAumento > 0 ? '#28a745' : percentualAumento < 0 ? '#dc3545' : '#6c757d'};">
-          <div style="display:flex; align-items:center; gap:6px; margin-bottom:2px;">
-            <span style="font-size:14px;">${ticketMedioIcon}</span>
-            <strong style="font-size:13px; color:${percentualAumento > 0 ? '#155724' : percentualAumento < 0 ? '#721c24' : '#495057'};">
-              R$ ${formatter.format(ticketMedioAtual.toFixed(2))} → R$ ${formatter.format(ticketMedioNovo.toFixed(2))}
-              ${percentualAumento !== 0 ? `(${percentualAumento > 0 ? '+' : ''}${percentualAumento.toFixed(1)}%)` : ''}
-            </strong>
-          </div>
-          <small style="color:#6c757d; font-size:11px;">Ticket médio • ${numeroOrcamentos} orçamento${numeroOrcamentos > 1 ? 's' : ''}</small>
-        </div>
-      `;
+        document.getElementById('calculatePrice').addEventListener('click', () => {
+            const tempoTratamentoAtual = parseInt(document.getElementById('currentTreatment').value);
+            const simularPara = parseInt(document.getElementById('simulateFor').value);
+            lastSimulateDias = simularPara;
+            
+            const totalGeral = parseFloat(document.querySelectorAll('#totals span')[2].innerText.replace('R$', '').replace('.', '').replace(',', '.'));
+            
+            const numeroOrcamentos = document.querySelectorAll('.orcamento-checkbox:checked').length;
+            
+            if (numeroOrcamentos === 0) {
+                alert('Selecione pelo menos um orçamento para calcular.');
+                return;
+            }
 
-      if (tempoTratamentoAtual === simularPara) {
-        lastRecommendation = `Mantendo ${simularPara} dias, o valor permanece R$ ${formatter.format(valorTotal.toFixed(2))}.`;
-      } else if (percentualAumento > 0) {
-        lastRecommendation = `💡 Oportunidade de ouro! Manipulando para ${simularPara} dias, você aumenta seu ticket médio em ${percentualAumento.toFixed(1)}% (de R$ ${formatter.format(ticketMedioAtual.toFixed(2))} para R$ ${formatter.format(ticketMedioNovo.toFixed(2))}), ${descontoAplicado > 0 ? `oferece R$ ${formatter.format(descontoAplicado.toFixed(2))} de desconto ao cliente ` : ''}e o pedido sai por R$ ${formatter.format(valorTotal.toFixed(2))}. Uma venda mais valiosa para todos! 🎯`;
-      } else if (percentualAumento < 0) {
-        lastRecommendation = `Manipulando para ${simularPara} dias, o valor fica R$ ${formatter.format(valorTotal.toFixed(2))}. O ticket médio reduz para R$ ${formatter.format(ticketMedioNovo.toFixed(2))} (${percentualAumento.toFixed(1)}%).`;
-      } else {
-        lastRecommendation = `Manipulando para ${simularPara} dias, o valor fica R$ ${formatter.format(valorTotal.toFixed(2))}. Ticket médio mantido em R$ ${formatter.format(ticketMedioAtual.toFixed(2))}.`;
-      }
-    });
+            let multiplicador, multiplicadorMes;
 
-    // Adiciona recomendação ao preview
-    document.getElementById('addRecommendation').addEventListener('click', () => {
-      if (!lastRecommendation) {
-        alert('Realize o cálculo antes de adicionar a recomendação.');
-        return;
-      }
-      let selected = document.getElementById('selectedOrcamentos');
-      let old = document.getElementById('recommendationInPreview');
-      if (old) old.remove();
+if (tempoTratamentoAtual === 30) {
+                switch (simularPara) {
+                    case 30: multiplicador = 1; multiplicadorMes = 1; break;
+                    case 60: multiplicador = 1.68; multiplicadorMes = 2; break;
+                    case 90: multiplicador = 2.24; multiplicadorMes = 3; break;
+                    case 120: multiplicador = 2.78; multiplicadorMes = 4; break;
+                }
+            } else if (tempoTratamentoAtual === 60) {
+                switch (simularPara) {
+                    case 30: multiplicador = 0.57; multiplicadorMes = 1; break;
+                    case 60: multiplicador = 1; multiplicadorMes = 2; break;
+                    case 90: multiplicador = 1.33; multiplicadorMes = 3; break;
+                    case 120: multiplicador = 1.74; multiplicadorMes = 4; break;
+                }
+            } else if (tempoTratamentoAtual === 90) {
+                switch (simularPara) {
+                    case 30: multiplicador = 0.42; multiplicadorMes = 1; break;
+                    case 60: multiplicador = 0.7; multiplicadorMes = 2; break;
+                    case 90: multiplicador = 1; multiplicadorMes = 3; break;
+                    case 120: multiplicador = 1.26; multiplicadorMes = 4; break;
+                }
+            } else if (tempoTratamentoAtual === 120) {
+                switch (simularPara) {
+                    case 30: multiplicador = 0.32; multiplicadorMes = 1; break;
+                    case 60: multiplicador = 0.60; multiplicadorMes = 2; break;
+                    case 90: multiplicador = 0.80; multiplicadorMes = 3; break;
+                    case 120: multiplicador = 1; multiplicadorMes = 4; break;
+                }
+            }
 
-      let recomendDiv = document.createElement('div');
-      recomendDiv.id = 'recommendationInPreview';
-      recomendDiv.className = 'message';
-      recomendDiv.style.background = '#fffbe6';
-      recomendDiv.style.position = 'relative';
+            const precoCalculado = totalGeral * multiplicador / multiplicadorMes;
+            const valorTotal = precoCalculado * multiplicadorMes;
+            
+            const descontoAplicado = (tempoTratamentoAtual === simularPara) ? 
+                0 : 
+                Math.abs((totalGeral * (simularPara / tempoTratamentoAtual)) - valorTotal);
+            
+            const ticketMedioAtual = totalGeral / numeroOrcamentos;
+            const ticketMedioNovo = valorTotal / numeroOrcamentos;
+            const percentualAumento = ((ticketMedioNovo - ticketMedioAtual) / ticketMedioAtual) * 100;
+            
+            let ticketMedioMsg = '';
+            let ticketMedioIcon = '';
+            let ticketMedioStyle = '';
+            
+            if (percentualAumento > 0) {
+                ticketMedioIcon = '📈';
+                ticketMedioStyle = 'color: #28a745; font-weight: bold;';
+                ticketMedioMsg = `${ticketMedioIcon} <span style="${ticketMedioStyle}">Ticket médio: R$ ${formatter.format(ticketMedioAtual.toFixed(2))} → R$ ${formatter.format(ticketMedioNovo.toFixed(2))} (+${percentualAumento.toFixed(1)}%)</span>`;
+            } else if (percentualAumento < 0) {
+                ticketMedioIcon = '📉';
+                ticketMedioStyle = 'color: #dc3545; font-weight: bold;';
+                ticketMedioMsg = `${ticketMedioIcon} <span style="${ticketMedioStyle}">Ticket médio: R$ ${formatter.format(ticketMedioAtual.toFixed(2))} → R$ ${formatter.format(ticketMedioNovo.toFixed(2))} (${percentualAumento.toFixed(1)}%)</span>`;
+            } else {
+                ticketMedioIcon = '➡️';
+                ticketMedioStyle = 'color: #6c757d; font-weight: bold;';
+                ticketMedioMsg = `${ticketMedioIcon} <span style="${ticketMedioStyle}">Ticket médio mantido: R$ ${formatter.format(ticketMedioAtual.toFixed(2))}</span>`;
+            }
+            
+            document.getElementById('calculationResult').innerHTML = `
+                <p><strong>💰 Valor Total:</strong> R$ ${formatter.format(valorTotal.toFixed(2))}</p>
+                <p><strong>📆 Valor por Mês:</strong> R$ ${formatter.format(precoCalculado.toFixed(2))}</p>
+                ${descontoAplicado > 0 ? 
+                    `<p><strong>🎉 Desconto Aplicado:</strong> R$ ${formatter.format(descontoAplicado.toFixed(2))}</p>` : 
+                    ''
+                }
+                <div style="margin-top: 12px; padding: 8px 12px; background: ${percentualAumento > 0 ? '#d4edda' : percentualAumento < 0 ? '#f8d7da' : '#e9ecef'}; border-radius: 6px; border-left: 3px solid ${percentualAumento > 0 ? '#28a745' : percentualAumento < 0 ? '#dc3545' : '#6c757d'};">
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+                        <span style="font-size: 14px;">${ticketMedioIcon}</span>
+                        <strong style="font-size: 13px; color: ${percentualAumento > 0 ? '#155724' : percentualAumento < 0 ? '#721c24' : '#495057'};">
+                            R$ ${formatter.format(ticketMedioAtual.toFixed(2))} → R$ ${formatter.format(ticketMedioNovo.toFixed(2))}
+                            ${percentualAumento !== 0 ? `(${percentualAumento > 0 ? '+' : ''}${percentualAumento.toFixed(1)}%)` : ''}
+                        </strong>
+                    </div>
+                    <small style="color: #6c757d; font-size: 11px;">Ticket médio • ${numeroOrcamentos} orçamento${numeroOrcamentos > 1 ? 's' : ''}</small>
+                </div>
+            `;
+            
+            if (tempoTratamentoAtual === simularPara) {
+                lastRecommendation = `Mantendo ${simularPara} dias, o valor permanece R$ ${formatter.format(valorTotal.toFixed(2))}.`;
+            } else if (percentualAumento > 0) {
+                lastRecommendation = `💡 Oportunidade de ouro! Manipulando para ${simularPara} dias, você aumenta seu ticket médio em ${percentualAumento.toFixed(1)}% (de R$ ${formatter.format(ticketMedioAtual.toFixed(2))} para R$ ${formatter.format(ticketMedioNovo.toFixed(2))}), ${descontoAplicado > 0 ? `oferece R$ ${formatter.format(descontoAplicado.toFixed(2))} de desconto ao cliente ` : ''}e o pedido sai por R$ ${formatter.format(valorTotal.toFixed(2))}. Uma venda mais valiosa para todos! 🎯`;
+            } else if (percentualAumento < 0) {
+                lastRecommendation = `Manipulando para ${simularPara} dias, o valor fica R$ ${formatter.format(valorTotal.toFixed(2))}. O ticket médio reduz para R$ ${formatter.format(ticketMedioNovo.toFixed(2))} (${percentualAumento.toFixed(1)}%).`;
+            } else {
+                lastRecommendation = `Manipulando para ${simularPara} dias, o valor fica R$ ${formatter.format(valorTotal.toFixed(2))}. Ticket médio mantido em R$ ${formatter.format(ticketMedioAtual.toFixed(2))}.`;
+            }
+        });
 
-      let closeBtn = document.createElement('span');
-      closeBtn.textContent = '✖';
-      closeBtn.title = 'Remover sugestão';
-      closeBtn.style.position = 'absolute';
-      closeBtn.style.top = '8px';
-      closeBtn.style.right = '12px';
-      closeBtn.style.cursor = 'pointer';
-      closeBtn.style.fontWeight = 'bold';
-      closeBtn.style.color = '#ff9800';
-      closeBtn.onclick = function() {
-        recomendDiv.remove();
-        window.lastRecommendation = '';
-      };
+        document.getElementById('addRecommendation').addEventListener('click', () => {
+            if (!lastRecommendation) {
+                alert('Realize o cálculo antes de adicionar a recomendação.');
+                return;
+            }
+            let selected = document.getElementById('selectedOrcamentos');
+            let old = document.getElementById('recommendationInPreview');
+            if (old) old.remove();
 
-      recomendDiv.innerHTML = `<strong>💡 Sugestão personalizada:</strong><br>${lastRecommendation}`;
-      recomendDiv.appendChild(closeBtn);
-      selected.prepend(recomendDiv);
-      window.lastRecommendation = lastRecommendation;
-    });
-  </script>
+            let recomendDiv = document.createElement('div');
+            recomendDiv.id = 'recommendationInPreview';
+            recomendDiv.className = 'message';
+            recomendDiv.style.background = '#fffbe6';
+            recomendDiv.style.position = 'relative';
+
+            let closeBtn = document.createElement('span');
+            closeBtn.textContent = '✖';
+            closeBtn.title = 'Remover sugestão';
+            closeBtn.style.position = 'absolute';
+            closeBtn.style.top = '8px';
+            closeBtn.style.right = '12px';
+            closeBtn.style.cursor = 'pointer';
+            closeBtn.style.fontWeight = 'bold';
+            closeBtn.style.color = '#ff9800';
+            closeBtn.onclick = function() {
+                recomendDiv.remove();
+                window.lastRecommendation = '';
+            };
+
+            recomendDiv.innerHTML = `<strong>💡 Sugestão personalizada:</strong><br>${lastRecommendation}`;
+            recomendDiv.appendChild(closeBtn);
+            selected.prepend(recomendDiv);
+            window.lastRecommendation = lastRecommendation;
+        });
+    </script>
 </body>
 </html>
-
