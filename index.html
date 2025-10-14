@@ -522,8 +522,11 @@ ${desconto > 0 ?
     });
 
 // 🔔 Se tiver Portaria, exibe aviso com opção de remover
-    if (temPortaria && maiorValidade > 0) {
+if (temPortaria && maiorValidade > 0) {
+    // Só cria o aviso se ainda não existir
+    if (!document.getElementById('avisoControlado')) {
         const avisoDiv = document.createElement('div');
+        avisoDiv.id = 'avisoControlado';
         avisoDiv.className = 'message';
         avisoDiv.style.cssText = `
             background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
@@ -555,31 +558,34 @@ ${desconto > 0 ?
                 </button>
             </div>
         `;
+
         selectedContainer.prepend(avisoDiv);
 
-        // controle global se deve copiar o aviso ou não
-        window.includeWarning = true;
+        // ✅ Só define uma vez globalmente — se não existir ainda
+        if (typeof window.includeWarning === 'undefined') {
+            window.includeWarning = true;
+        }
 
+        // Botão remover
         avisoDiv.querySelector('#removeWarning').onclick = () => {
+            window.includeWarning = false; // define global antes
             avisoDiv.style.transition = 'all 0.3s ease';
             avisoDiv.style.opacity = '0';
             avisoDiv.style.transform = 'translateY(-10px)';
-            setTimeout(() => {
-                avisoDiv.remove();
-            }, 300);
-            window.includeWarning = false;
+            setTimeout(() => avisoDiv.remove(), 300);
         };
 
+        // Botão manter
         avisoDiv.querySelector('#keepWarning').onclick = () => {
+            window.includeWarning = true; // define global antes
             avisoDiv.style.transition = 'all 0.3s ease';
             avisoDiv.style.opacity = '0';
             avisoDiv.style.transform = 'translateY(-10px)';
-            setTimeout(() => {
-                avisoDiv.remove();
-            }, 300);
-            window.includeWarning = true;
+            setTimeout(() => avisoDiv.remove(), 300);
         };
     }
+}
+
 
     // adiciona aviso no texto copiado, se não removido
     if (temPortaria && maiorValidade > 0 && (window.includeWarning ?? true)) {
@@ -774,6 +780,7 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
+
 
 
 
