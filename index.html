@@ -389,121 +389,129 @@
         }
 
 function updateSelected() {
-  const selectedContainer = document.getElementById('selectedOrcamentos');
-  const totalsContainer = document.getElementById('totals');
-  selectedContainer.innerHTML = '';
-
-  let totalBruto = 0;
-  let totalDesconto = 0;
-  let totalGeral = 0;
-
-  let copiedText = '';
-  const introMessage = `
+    let recommendationText = '';
+    const selectedContainer = document.getElementById('selectedOrcamentos');
+    const totalsContainer = document.getElementById('totals');
+    selectedContainer.innerHTML = '';
+    let totalBruto = 0;
+    let totalDesconto = 0;
+    let totalGeral = 0;
+    let copiedText = '';
+    const introMessage = `
 ✨ Obrigado por escolher nossa farmácia de manipulação! ✨
 
 Fiz seu orçamento com todo cuidado e atenção que você merece!
 
 `;
-  const conclusionMessage = `
+    const conclusionMessage = `
 Assim que aprovado, nossa equipe começa imediatamente a manipular sua fórmula com todo o cuidado que você merece.
 
 Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e bem-estar! 
 
 `;
 
-  copiedText += introMessage;
+    copiedText += introMessage;
 
-  // Mostra recomendação (se houver) apenas no preview
-  if (window.lastRecommendation) {
-    const old = document.getElementById('recommendationInPreview');
-    if (old) old.remove();
+    if (window.lastRecommendation) {
+        let old = document.getElementById('recommendationInPreview');
+        if (old) old.remove();
 
-    const recomendDiv = document.createElement('div');
-    recomendDiv.id = 'recommendationInPreview';
-    recomendDiv.className = 'message';
-    recomendDiv.style.background = '#fffbe6';
-    recomendDiv.innerHTML = `<strong>💡 Sugestão personalizada:</strong><br>${window.lastRecommendation}`;
-    selectedContainer.appendChild(recomendDiv);
-  }
-
-  // Flags de controlado
-  let maiorValidade = 0;
-  let temPortaria = false;
-
-  // Loop dos orçamentos selecionados
-  document.querySelectorAll('.orcamento-checkbox:checked').forEach(checkbox => {
-    const numero = checkbox.getAttribute('data-numero');
-    const detalhes = JSON.parse(decodeURIComponent(checkbox.getAttribute('data-detalhes')));
-    const formattedNumero = (numero || '').replace(/\s+/g, '');
-
-    const componentesArray = detalhes.map(item => {
-      const quantidadeFormatada = formatQuantidadeDosagem(item['Quantidade Dosagem']);
-      return `${item['Componentes da Fórmula']}: ${quantidadeFormatada}`;
-    });
-    const componentesHtml = componentesArray.join('<br>');
-    const componentesText = componentesArray.join('\n');
-
-    const item = detalhes[0];
-    const bruto = parseFloat(item['Valor_Bruto']);
-    const desconto = parseFloat(item['Valor_Desconto']);
-    const geral = parseFloat(item['Valor a Pagar']);
-
-    totalBruto += bruto;
-    totalDesconto += desconto;
-    totalGeral += geral;
-
-    const formattedBruto = formatter.format(bruto);
-    const formattedDesconto = formatter.format(desconto);
-    const formattedGeral = formatter.format(geral);
-
-    // Detecta portaria e validade (fica com o menor prazo encontrado)
-    for (const det of detalhes) {
-      const portaria = (det['Portaria'] || '').toUpperCase().trim();
-      if (!portaria) continue;
-      if (/^C[1-5]$/.test(portaria) || /^B[1-2]$/.test(portaria) || /^A[1-3]$/.test(portaria)) {
-        temPortaria = true;
-        maiorValidade = (maiorValidade === 0 ? 30 : Math.min(maiorValidade, 30));
-      }
-      if (portaria === 'AM') {
-        temPortaria = true;
-        maiorValidade = (maiorValidade === 0 ? 10 : Math.min(maiorValidade, 10));
-      }
+        let recomendDiv = document.createElement('div');
+        recomendDiv.id = 'recommendationInPreview';
+        recomendDiv.className = 'message';
+        recomendDiv.style.background = '#fffbe6';
+        recomendDiv.innerHTML = `<strong>💡 Sugestão personalizada:</strong><br>${window.lastRecommendation}`;
+        selectedContainer.appendChild(recomendDiv);
     }
 
-    // Card do orçamento no preview
-    const message = document.createElement('div');
-    message.classList.add('message');
-    message.style.position = "relative";
+    let maiorValidade = 0; // armazenar o menor prazo (10 ou 30 dias)
+    let temPortaria = false; // flag de controle
 
-    const closeBtn = document.createElement('span');
-    closeBtn.textContent = '✖';
-    closeBtn.title = 'Remover este orçamento';
-    closeBtn.style.position = 'absolute';
-    closeBtn.style.top = '8px';
-    closeBtn.style.right = '12px';
-    closeBtn.style.cursor = 'pointer';
-    closeBtn.style.fontWeight = 'bold';
-    closeBtn.style.color = '#dc3545';
-    closeBtn.onclick = () => {
-      const check = document.querySelector(`.orcamento-checkbox[data-numero="${numero}"]`);
-      if (check) { check.checked = false; check.dispatchEvent(new Event('change')); }
-    };
-    message.appendChild(closeBtn);
+    document.querySelectorAll('.orcamento-checkbox:checked').forEach(checkbox => {
+        const numero = checkbox.getAttribute('data-numero');
+        const detalhes = JSON.parse(decodeURIComponent(checkbox.getAttribute('data-detalhes')));
+        const formattedNumero = (numero || '').replace(/\s+/g, '');
+        const componentesArray = detalhes.map(item => {
+            const quantidadeFormatada = formatQuantidadeDosagem(item['Quantidade Dosagem']);
+            return `${item['Componentes da Fórmula']}: ${quantidadeFormatada}`;
+        });
+        const componentesHtml = componentesArray.join('<br>');
+        const componentesText = componentesArray.join('\n');
+        const item = detalhes[0];
+        const bruto = parseFloat(item['Valor_Bruto']);
+        const desconto = parseFloat(item['Valor_Desconto']);
+        const geral = parseFloat(item['Valor a Pagar']);
+        totalBruto += bruto;
+        totalDesconto += desconto;
+        totalGeral += geral;
+        const formattedBruto = formatter.format(bruto);
+        const formattedDesconto = formatter.format(desconto);
+        const formattedGeral = formatter.format(geral);
 
-    message.insertAdjacentHTML("beforeend", `
-      <strong>📝 Orçamento N:</strong> ${numero}<br><br>
-      <strong>Fórmula Farmacêutica:</strong> ${item['Fórmula Farmacêutica']}<br>
-      <strong>Quantidade:</strong> ${item['Quantidade']}  
-      <strong>Quantidade de Potes:</strong> ${item['Quantidade Potes']}<br><br> 
-      <strong>📦 Fórmula Manipulada:</strong><br>${componentesHtml}<br><br>
-      <strong>Bruto:</strong> R$ ${formattedBruto} 
-      | <strong>Desconto:</strong> R$ ${formattedDesconto} 
-      | <strong>Geral:</strong> R$ ${formattedGeral}
-    `);
-    selectedContainer.appendChild(message);
 
-    // Texto de cada orçamento para copiar
-    copiedText += `
+        let validadeDias = 0;
+        
+        for (const det of detalhes) {
+          const portaria = (det['Portaria'] || '').toUpperCase().trim();
+          if (!portaria) continue;
+        
+          if (/^C[1-5]$/.test(portaria) || /^B[1-2]$/.test(portaria) || /^A[1-3]$/.test(portaria)) {
+            validadeDias = 30;
+            temPortaria = true;
+            break;
+          }
+        
+          if (portaria === 'AM') {
+            validadeDias = 10;
+            temPortaria = true;
+            break;
+          }
+        }
+        
+        // usa o menor prazo encontrado (10 dias tem prioridade)
+        if (temPortaria) {
+          if (maiorValidade === 0 || validadeDias < maiorValidade) {
+            maiorValidade = validadeDias;
+          }
+        }
+
+
+        const message = document.createElement('div');
+        message.classList.add('message');
+        message.style.position = "relative";
+
+        let closeBtn = document.createElement('span');
+        closeBtn.textContent = '✖';
+        closeBtn.title = 'Remover este orçamento';
+        closeBtn.style.position = 'absolute';
+        closeBtn.style.top = '8px';
+        closeBtn.style.right = '12px';
+        closeBtn.style.cursor = 'pointer';
+        closeBtn.style.fontWeight = 'bold';
+        closeBtn.style.color = '#dc3545';
+        closeBtn.onclick = () => {
+            const check = document.querySelector(`.orcamento-checkbox[data-numero="${numero}"]`);
+            if (check) {
+                check.checked = false;
+                check.dispatchEvent(new Event('change'));
+            }
+        };
+        message.appendChild(closeBtn);
+
+        message.insertAdjacentHTML("beforeend", `
+            <strong>📝 Orçamento N:</strong> ${numero}<br><br>
+            <strong>Fórmula Farmacêutica:</strong> ${item['Fórmula Farmacêutica']}<br>
+            <strong>Quantidade:</strong> ${item['Quantidade']}  
+            <strong>Quantidade de Potes:</strong> ${item['Quantidade Potes']}<br><br> 
+            <strong>📦 Fórmula Manipulada:</strong><br>${componentesHtml}<br><br>
+            <strong>Bruto:</strong> R$ ${formattedBruto} 
+            | <strong>Desconto:</strong> R$ ${formattedDesconto} 
+            | <strong>Geral:</strong> R$ ${formattedGeral}
+        `);
+
+        selectedContainer.appendChild(message);
+
+        copiedText += `
 📝 ORC:${formattedNumero} | Quantidade: ${item['Quantidade']} | Potes: ${item['Quantidade Potes']}
 
 Fórmula Manipulada:
@@ -515,57 +523,71 @@ ${desconto > 0 ?
 `Total no PIX: R$ ${formattedGeral}`}
 
 `;
-  });
+    });
 
-  // 👉 Totais Consolidados SEMPRE no texto copiado (agora fora das strings do intro)
-  const consolidados = totalDesconto > 0
-    ? `
+    if (totalDesconto > 0) {
+        copiedText += `
 Totais Consolidados:
 💰 TOTAL: R$ ${formatter.format(totalBruto)}
 🎉 TOTAL DE DESCONTOS: R$ ${formatter.format(totalDesconto)}
 💲 Total no PIX: R$ ${formatter.format(totalGeral)}
 
-`
-    : `
+`;
+    } else {
+        copiedText += `
 Totais Consolidados:
 💰 TOTAL: R$ ${formatter.format(totalBruto)}
 💲 Total no PIX: R$ ${formatter.format(totalGeral)}
 
 `;
-  copiedText += consolidados;
+    }
 
-  // Aviso de controlado (se houver)
-  if (temPortaria && maiorValidade > 0) {
-    copiedText += `
+    if (temPortaria && maiorValidade > 0) {
+        copiedText += `
 ⚠️ Este é um medicamento de controle especial, por isso precisamos da receita original dentro da validade de ${maiorValidade} dias para dar início à manipulação.
 Se for mais prático, você também pode enviar a receita digitalmente, desde que possua QR Code ativo ou assinatura digital válida.
 
 `;
-  }
-
-  // Conclusão
-  copiedText += conclusionMessage;
-
-  // Totais no preview (tela)
-  totalsContainer.innerHTML = `
-    <div>💰 Total: <span>R$ ${formatter.format(totalBruto)}</span></div>
-    <div>🎉 Total Desconto: <span>R$ ${formatter.format(totalDesconto)}</span></div>
-    <div>💲 Total no PIX: <span>R$ ${formatter.format(totalGeral)}</span></div>
-  `;
-
-  // Botão copiar
-  document.getElementById('copyButton').onclick = () => {
-    let finalText = copiedText;
-    if (window.lastRecommendation) {
-      finalText = finalText.replace(
-        conclusionMessage,
-        `💡 Sugestão Exclusiva: ${window.lastRecommendation}\n\n${conclusionMessage}`
-      );
     }
-    navigator.clipboard.writeText(finalText)
-      .then(() => alert('✅ Orçamento copiado com sucesso!'))
-      .catch(() => alert('❌ Não foi possível copiar automaticamente.'));
-  };
+
+    copiedText += conclusionMessage;
+
+    totalsContainer.innerHTML = `
+        <div>💰 Total: <span>R$ ${formatter.format(totalBruto)}</span></div>
+        <div>🎉 Total Desconto: <span>R$ ${formatter.format(totalDesconto)}</span></div>
+        <div>💲 Total no PIX: <span>R$ ${formatter.format(totalGeral)}</span></div>
+    `;
+
+    document.getElementById('copyButton').onclick = () => {
+        let finalText = copiedText;
+        if (window.lastRecommendation) {
+            finalText = finalText.replace(
+                conclusionMessage,
+                `💡 Sugestão Exclusiva: ${window.lastRecommendation}\n\n${conclusionMessage}`
+            );
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(finalText).then(() => {
+                alert('Orçamentos copiados com sucesso!');
+            }).catch(err => {
+                console.error('Erro ao copiar para a área de transferência:', err);
+                alert('Não foi possível copiar os orçamentos automaticamente. Tente copiar manualmente.');
+            });
+        } else {
+            const textarea = document.createElement('textarea');
+            textarea.value = finalText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                alert('Orçamentos copiados com sucesso!');
+            } catch (err) {
+                console.error('Erro ao copiar usando execCommand:', err);
+                alert('Não foi possível copiar os orçamentos automaticamente. Tente copiar manualmente.');
+            }
+            document.body.removeChild(textarea);
+        }
+    };
 }
 
 
@@ -729,18 +751,3 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
