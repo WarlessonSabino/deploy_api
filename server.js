@@ -77,13 +77,16 @@ app.get('/requisicoes', (req, res) => {
             END AS "Quantidade Potes",     
 
             CASE
-              WHEN fc15110.cdpro <> fc15110.cdprin
-                   THEN fc03200.descrprd
-              WHEN TRIM(fc15110.descr) NOT IN (TRIM(fc03000.descrprd))
-                   THEN fc15110.descr
-              WHEN fc03000.descrprd is null THEN fc15110.descr
+              WHEN fc15110.cdpro <> fc15110.cdprin THEN
+                CASE
+                  WHEN fc03200.descrprd <> fc15110.descr THEN fc15110.descr
+                  ELSE fc03200.descrprd
+                END
+              WHEN TRIM(fc15110.descr) NOT IN (TRIM(fc03000.descrprd)) THEN fc15110.descr
+              WHEN fc03000.descrprd IS NULL THEN fc15110.descr
               ELSE fc03000.descrprd
-            END AS "Componentes da Fórmula",
+            END AS "Componentes da Fórmula"
+
 
 
             ROUND(
@@ -157,6 +160,7 @@ app.get('/requisicoes', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
