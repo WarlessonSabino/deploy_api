@@ -85,7 +85,7 @@ app.get('/requisicoes', (req, res) => {
               WHEN TRIM(fc15110.descr) NOT IN (TRIM(fc03000.descrprd)) THEN fc15110.descr
               WHEN fc03000.descrprd IS NULL THEN fc15110.descr
               ELSE fc03000.descrprd
-            END AS "Componentes da Fórmula"
+            END AS "Componentes da Fórmula",
 
 
 
@@ -160,6 +160,7 @@ app.get('/requisicoes', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
