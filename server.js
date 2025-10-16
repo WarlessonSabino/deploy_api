@@ -79,13 +79,13 @@ app.get('/requisicoes', (req, res) => {
             CASE
               WHEN fc15110.cdpro <> fc15110.cdprin THEN
                 CASE
-                  WHEN fc15110.cdpro = fc03200.cdsin
-                  THEN fc03200.descrprd
+                  WHEN TRIM(fc15110.descr) <> TRIM(fc03200.descrprd) THEN fc03000.descrprd
+                  WHEN fc15110.cdpro = fc03200.cdsin THEN fc03200.descrprd
+                  ELSE fc15110.descr
                 END
-              WHEN TRIM(fc15110.descr) NOT IN (TRIM(fc03000.descrprd)) THEN fc15110.descr
-              WHEN fc03000.descrprd IS NULL THEN fc15110.descr
-              ELSE fc03000.descrprd
-            END AS "Componentes da Fórmula",
+            
+              WHEN fc03000.descrprd IS NULL THEN 
+                fc15110.descr
 
 
 
@@ -160,6 +160,7 @@ app.get('/requisicoes', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
