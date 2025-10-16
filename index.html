@@ -247,7 +247,7 @@
         <div class="totals" id="totals">
             <div>💰 Total: <span>R$ 0.00</span></div>
             <div>🎉 Total Desconto: <span>R$ 0.00</span></div>
-            <div>💲 DESCONTO DIA DO MÉDICO: <span>R$ 0.00</span></div>
+            <div>💲 Desconto Dia do Médico: <span>R$ 0.00</span></div>
         </div>
 
         <button id="copyButton" style="display: none;">Copiar Orçamentos</button>
@@ -318,7 +318,7 @@
             document.getElementById('totals').innerHTML = `
                 <div>💰 Total: <span>R$ 0.00</span></div>
                 <div>🎉 Total Desconto: <span>R$ 0.00</span></div>
-                <div>💲 DESCONTO DIA DO MÉDICO: <span>R$ 0.00</span></div>
+                <div>💲 Desconto Dia do Médico: <span>R$ 0.00</span></div>
             `;
             document.getElementById('results').style.display = 'none';
             document.getElementById('copyButton').style.display = 'none';
@@ -519,8 +519,8 @@ ${componentesText}
 
 
 ${desconto > 0 ? 
-`Total: R$ ${formattedBruto} | Total de Descontos: R$ ${formattedDesconto} | DESCONTO DIA DO MÉDICO: R$ ${formattedGeral}` : 
-`DESCONTO DIA DO MÉDICO: R$ ${formattedGeral}`}
+`Total: R$ ${formattedBruto} | Total de Descontos: R$ ${formattedDesconto} | Desconto Dia do Médico: R$ ${formattedGeral}` : 
+`Desconto Dia do Médico: R$ ${formattedGeral}`}
 
 `;
     });
@@ -530,14 +530,14 @@ ${desconto > 0 ?
 Totais Consolidados:
 💰 TOTAL: R$ ${formatter.format(totalBruto)}
 🎉 TOTAL DE DESCONTOS: R$ ${formatter.format(totalDesconto)}
-💲 DESCONTO DIA DO MÉDICO: R$ ${formatter.format(totalGeral)}
+💲 Desconto Dia do Médico: R$ ${formatter.format(totalGeral)}
 
 `;
     } else {
         copiedText += `
 Totais Consolidados:
 💰 TOTAL: R$ ${formatter.format(totalBruto)}
-💲 DESCONTO DIA DO MÉDICO: R$ ${formatter.format(totalGeral)}
+💲 Desconto Dia do Médico: R$ ${formatter.format(totalGeral)}
 
 `;
     }
@@ -555,7 +555,7 @@ Se for mais prático, você também pode enviar a receita digitalmente, desde qu
     totalsContainer.innerHTML = `
         <div>💰 Total: <span>R$ ${formatter.format(totalBruto)}</span></div>
         <div>🎉 Total Desconto: <span>R$ ${formatter.format(totalDesconto)}</span></div>
-        <div>💲 DESCONTO DIA DO MÉDICO: <span>R$ ${formatter.format(totalGeral)}</span></div>
+        <div>💲 Desconto Dia do Médico: <span>R$ ${formatter.format(totalGeral)}</span></div>
     `;
 
     document.getElementById('copyButton').onclick = () => {
@@ -751,4 +751,5 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
+
 
