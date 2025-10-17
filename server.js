@@ -76,16 +76,264 @@ app.get('/requisicoes', (req, res) => {
                 ELSE fc15100.qtfor
             END AS "Quantidade Potes",     
 
-            CASE
-              WHEN fc15110.cdpro <> fc15110.cdprin THEN
-                CASE
-                  WHEN POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(fc15110.descr))) > 0 THEN fc03200.descrprd
-                  ELSE fc15110.descr
-                END
-              WHEN UPPER(TRIM(fc15110.descr)) = UPPER(TRIM(fc03000.descr)) THEN fc03000.descrprd
-              WHEN fc03000.descrprd IS NULL THEN fc15110.descr
-              ELSE fc03000.descrprd
-            END AS "Componentes da Fórmula",
+            TRIM(
+              COALESCE(
+                SUBSTRING(
+                  TRIM(
+                    CASE
+                      WHEN fc15110.cdpro <> fc15110.cdprin THEN
+                        CASE
+                          WHEN POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(fc15110.descr))) > 0 THEN fc03200.descrprd
+                          ELSE fc15110.descr
+                        END
+                      WHEN fc15110.cdpro = fc15110.cdprin
+                           AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descr))
+                           AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descrprd))
+                        THEN fc15110.descr
+                      WHEN UPPER(TRIM(fc15110.descr)) = UPPER(TRIM(fc03000.descr)) THEN fc03000.descrprd
+                      WHEN fc03000.descrprd IS NULL THEN fc15110.descr
+                      ELSE fc03000.descrprd
+                    END
+                  ) FROM 1 FOR NULLIF(POSITION('DERMATO' IN UPPER(
+                    TRIM(
+                      CASE
+                        WHEN fc15110.cdpro <> fc15110.cdprin THEN
+                          CASE
+                            WHEN POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(fc15110.descr))) > 0 THEN fc03200.descrprd
+                            ELSE fc15110.descr
+                          END
+                        WHEN fc15110.cdpro = fc15110.cdprin
+                             AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descr))
+                             AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descrprd))
+                          THEN fc15110.descr
+                        WHEN UPPER(TRIM(fc15110.descr)) = UPPER(TRIM(fc03000.descr)) THEN fc03000.descrprd
+                        WHEN fc03000.descrprd IS NULL THEN fc15110.descr
+                        ELSE fc03000.descrprd
+                      END
+                    )
+                  )), 0) - 1),
+                SUBSTRING(
+                  TRIM(
+                    CASE
+                      WHEN fc15110.cdpro <> fc15110.cdprin THEN
+                        CASE
+                          WHEN POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(fc15110.descr))) > 0 THEN fc03200.descrprd
+                          ELSE fc15110.descr
+                        END
+                      WHEN fc15110.cdpro = fc15110.cdprin
+                           AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descr))
+                           AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descrprd))
+                        THEN fc15110.descr
+                      WHEN UPPER(TRIM(fc15110.descr)) = UPPER(TRIM(fc03000.descr)) THEN fc03000.descrprd
+                      WHEN fc03000.descrprd IS NULL THEN fc15110.descr
+                      ELSE fc03000.descrprd
+                    END
+                  ) FROM 1 FOR NULLIF(POSITION('DILUIDO' IN UPPER(
+                    TRIM(
+                      CASE
+                        WHEN fc15110.cdpro <> fc15110.cdprin THEN
+                          CASE
+                            WHEN POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(fc15110.descr))) > 0 THEN fc03200.descrprd
+                            ELSE fc15110.descr
+                          END
+                        WHEN fc15110.cdpro = fc15110.cdprin
+                             AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descr))
+                             AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descrprd))
+                          THEN fc15110.descr
+                        WHEN UPPER(TRIM(fc15110.descr)) = UPPER(TRIM(fc03000.descr)) THEN fc03000.descrprd
+                        WHEN fc03000.descrprd IS NULL THEN fc15110.descr
+                        ELSE fc03000.descrprd
+                      END
+                    )
+                  )), 0) - 1),
+                SUBSTRING(
+                  TRIM(
+                    CASE
+                      WHEN fc15110.cdpro <> fc15110.cdprin THEN
+                        CASE
+                          WHEN POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(fc15110.descr))) > 0 THEN fc03200.descrprd
+                          ELSE fc15110.descr
+                        END
+                      WHEN fc15110.cdpro = fc15110.cdprin
+                           AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descr))
+                           AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descrprd))
+                        THEN fc15110.descr
+                      WHEN UPPER(TRIM(fc15110.descr)) = UPPER(TRIM(fc03000.descr)) THEN fc03000.descrprd
+                      WHEN fc03000.descrprd IS NULL THEN fc15110.descr
+                      ELSE fc03000.descrprd
+                    END
+                  ) FROM 1 FOR NULLIF(POSITION('USAR ESTE' IN UPPER(
+                    TRIM(
+                      CASE
+                        WHEN fc15110.cdpro <> fc15110.cdprin THEN
+                          CASE
+                            WHEN POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(fc15110.descr))) > 0 THEN fc03200.descrprd
+                            ELSE fc15110.descr
+                          END
+                        WHEN fc15110.cdpro = fc15110.cdprin
+                             AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descr))
+                             AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descrprd))
+                          THEN fc15110.descr
+                        WHEN UPPER(TRIM(fc15110.descr)) = UPPER(TRIM(fc03000.descr)) THEN fc03000.descrprd
+                        WHEN fc03000.descrprd IS NULL THEN fc15110.descr
+                        ELSE fc03000.descrprd
+                      END
+                    )
+                  )), 0) - 1),
+                SUBSTRING(
+                  TRIM(
+                    CASE
+                      WHEN fc15110.cdpro <> fc15110.cdprin THEN
+                        CASE
+                          WHEN POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(fc15110.descr))) > 0 THEN fc03200.descrprd
+                          ELSE fc15110.descr
+                        END
+                      WHEN fc15110.cdpro = fc15110.cdprin
+                           AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descr))
+                           AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descrprd))
+                        THEN fc15110.descr
+                      WHEN UPPER(TRIM(fc15110.descr)) = UPPER(TRIM(fc03000.descr)) THEN fc03000.descrprd
+                      WHEN fc03000.descrprd IS NULL THEN fc15110.descr
+                      ELSE fc03000.descrprd
+                    END
+                  ) FROM 1 FOR NULLIF(POSITION('NAO USAR' IN UPPER(
+                    TRIM(
+                      CASE
+                        WHEN fc15110.cdpro <> fc15110.cdprin THEN
+                          CASE
+                            WHEN POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(fc15110.descr))) > 0 THEN fc03200.descrprd
+                            ELSE fc15110.descr
+                          END
+                        WHEN fc15110.cdpro = fc15110.cdprin
+                             AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descr))
+                             AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descrprd))
+                          THEN fc15110.descr
+                        WHEN UPPER(TRIM(fc15110.descr)) = UPPER(TRIM(fc03000.descr)) THEN fc03000.descrprd
+                        WHEN fc03000.descrprd IS NULL THEN fc15110.descr
+                        ELSE fc03000.descrprd
+                      END
+                    )
+                  )), 0) - 1),
+                SUBSTRING(
+                  TRIM(
+                    CASE
+                      WHEN fc15110.cdpro <> fc15110.cdprin THEN
+                        CASE
+                          WHEN POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(fc15110.descr))) > 0 THEN fc03200.descrprd
+                          ELSE fc15110.descr
+                        END
+                      WHEN fc15110.cdpro = fc15110.cdprin
+                           AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descr))
+                           AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descrprd))
+                        THEN fc15110.descr
+                      WHEN UPPER(TRIM(fc15110.descr)) = UPPER(TRIM(fc03000.descr)) THEN fc03000.descrprd
+                      WHEN fc03000.descrprd IS NULL THEN fc15110.descr
+                      ELSE fc03000.descrprd
+                    END
+                  ) FROM 1 FOR NULLIF(POSITION('ACIMA DE' IN UPPER(
+                    TRIM(
+                      CASE
+                        WHEN fc15110.cdpro <> fc15110.cdprin THEN
+                          CASE
+                            WHEN POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(fc15110.descr))) > 0 THEN fc03200.descrprd
+                            ELSE fc15110.descr
+                          END
+                        WHEN fc15110.cdpro = fc15110.cdprin
+                             AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descr))
+                             AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descrprd))
+                          THEN fc15110.descr
+                        WHEN UPPER(TRIM(fc15110.descr)) = UPPER(TRIM(fc03000.descr)) THEN fc03000.descrprd
+                        WHEN fc03000.descrprd IS NULL THEN fc15110.descr
+                        ELSE fc03000.descrprd
+                      END
+                    )
+                  )), 0) - 1),
+                SUBSTRING(
+                  TRIM(
+                    CASE
+                      WHEN fc15110.cdpro <> fc15110.cdprin THEN
+                        CASE
+                          WHEN POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(fc15110.descr))) > 0 THEN fc03200.descrprd
+                          ELSE fc15110.descr
+                        END
+                      WHEN fc15110.cdpro = fc15110.cdprin
+                           AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descr))
+                           AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descrprd))
+                        THEN fc15110.descr
+                      WHEN UPPER(TRIM(fc15110.descr)) = UPPER(TRIM(fc03000.descr)) THEN fc03000.descrprd
+                      WHEN fc03000.descrprd IS NULL THEN fc15110.descr
+                      ELSE fc03000.descrprd
+                    END
+                  ) FROM 1 FOR NULLIF(POSITION('ABAIXO DE' IN UPPER(
+                    TRIM(
+                      CASE
+                        WHEN fc15110.cdpro <> fc15110.cdprin THEN
+                          CASE
+                            WHEN POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(fc15110.descr))) > 0 THEN fc03200.descrprd
+                            ELSE fc15110.descr
+                          END
+                        WHEN fc15110.cdpro = fc15110.cdprin
+                             AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descr))
+                             AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descrprd))
+                          THEN fc15110.descr
+                        WHEN UPPER(TRIM(fc15110.descr)) = UPPER(TRIM(fc03000.descr)) THEN fc03000.descrprd
+                        WHEN fc03000.descrprd IS NULL THEN fc15110.descr
+                        ELSE fc03000.descrprd
+                      END
+                    )
+                  )), 0) - 1),
+                SUBSTRING(
+                  TRIM(
+                    CASE
+                      WHEN fc15110.cdpro <> fc15110.cdprin THEN
+                        CASE
+                          WHEN POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(fc15110.descr))) > 0 THEN fc03200.descrprd
+                          ELSE fc15110.descr
+                        END
+                      WHEN fc15110.cdpro = fc15110.cdprin
+                           AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descr))
+                           AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descrprd))
+                        THEN fc15110.descr
+                      WHEN UPPER(TRIM(fc15110.descr)) = UPPER(TRIM(fc03000.descr)) THEN fc03000.descrprd
+                      WHEN fc03000.descrprd IS NULL THEN fc15110.descr
+                      ELSE fc03000.descrprd
+                    END
+                  ) FROM 1 FOR NULLIF(POSITION('CAP' IN UPPER(
+                    TRIM(
+                      CASE
+                        WHEN fc15110.cdpro <> fc15110.cdprin THEN
+                          CASE
+                            WHEN POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(fc15110.descr))) > 0 THEN fc03200.descrprd
+                            ELSE fc15110.descr
+                          END
+                        WHEN fc15110.cdpro = fc15110.cdprin
+                             AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descr))
+                             AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descrprd))
+                          THEN fc15110.descr
+                        WHEN UPPER(TRIM(fc15110.descr)) = UPPER(TRIM(fc03000.descr)) THEN fc03000.descrprd
+                        WHEN fc03000.descrprd IS NULL THEN fc15110.descr
+                        ELSE fc03000.descrprd
+                      END
+                    )
+                  )), 0) - 1),
+                TRIM(
+                  CASE
+                    WHEN fc15110.cdpro <> fc15110.cdprin THEN
+                      CASE
+                        WHEN POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(fc15110.descr))) > 0 THEN fc03200.descrprd
+                        ELSE fc15110.descr
+                      END
+                    WHEN fc15110.cdpro = fc15110.cdprin
+                         AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descr))
+                         AND UPPER(TRIM(fc15110.descr)) <> UPPER(TRIM(fc03000.descrprd))
+                      THEN fc15110.descr
+                    WHEN UPPER(TRIM(fc15110.descr)) = UPPER(TRIM(fc03000.descr)) THEN fc03000.descrprd
+                    WHEN fc03000.descrprd IS NULL THEN fc15110.descr
+                    ELSE fc03000.descrprd
+                  END
+                )
+              )
+            ) AS "Componentes da Fórmula",
 
 
 
@@ -161,6 +409,7 @@ app.get('/requisicoes', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
