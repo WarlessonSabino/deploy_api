@@ -519,8 +519,8 @@ ${componentesText}
 
 
 ${desconto > 0 ? 
-`Total Bruto: R$ ${formattedBruto} | Total no Cartão: R$ ${formatter.format(bruto * 1.10)} | Total no Pix (15% de desconto): R$ ${formatter.format(bruto * 0.85)}` : 
-`Total Bruto: R$ ${formattedBruto} | Total no Cartão: R$ ${formatter.format(bruto * 1.10)} | Total no Pix (15% de desconto): R$ ${formatter.format(bruto * 0.85)}`}
+`Total Bruto: R$ ${formattedBruto} | Total no Cartão (10% de desconto): R$ ${formatter.format(bruto * 0.90)} | Total no Pix (15% de desconto): R$ ${formatter.format(bruto * 0.85)}` : 
+`Total Bruto: R$ ${formattedBruto} | Total no Cartão (10% de desconto): R$ ${formatter.format(bruto * 0.90)} | Total no Pix (15% de desconto): R$ ${formatter.format(bruto * 0.85)}`}
 
 
 `;
@@ -530,7 +530,7 @@ ${desconto > 0 ?
     copiedText += `
     Totais Consolidados:
     💰 TOTAL BRUTO: R$ ${formatter.format(totalBruto)}
-    💳 TOTAL NO CARTÃO: R$ ${formatter.format(totalBruto * 1.10)}
+    💳 TOTAL NO CARTÃO (10% de desconto): R$ ${formatter.format(totalBruto * 0.90)}
     💸 TOTAL NO PIX (15% de desconto): R$ ${formatter.format(totalBruto * 0.85)}
 
     `;
@@ -539,6 +539,7 @@ ${desconto > 0 ?
         copiedText += `
 Totais Consolidados:
 💰 TOTAL: R$ ${formatter.format(totalBruto)}
+💳 TOTAL NO CARTÃO (10% de desconto): R$ ${formatter.format(totalBruto * 0.90)}
 💸 TOTAL NO PIX (15% de desconto): R$ ${formatter.format(totalBruto * 0.85)}
 
 `;
@@ -556,7 +557,7 @@ Se for mais prático, você também pode enviar a receita digitalmente, desde qu
 
     totalsContainer.innerHTML = `
         <div>💰 Total Bruto: <span>R$ ${formatter.format(totalBruto)}</span></div>
-        <div>💳 Total no Cartão <span>R$ ${formatter.format(totalBruto * 1.10)}</span></div>
+        <div>💳 Total no Cartão (10% de desconto) <span>R$ ${formatter.format(totalBruto * 0.90)}</span></div>
         <div>💸 Total no Pix (15% de desconto): <span>R$ ${formatter.format(totalBruto * 0.85)}</span></div>
     `;
 
@@ -754,3 +755,4 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
+
