@@ -245,10 +245,11 @@
         <div id="selectedOrcamentos"></div>
 
         <div class="totals" id="totals">
-            <div>💰 Total: <span>R$ 0.00</span></div>
-            <div>🎉 Total Desconto: <span>R$ 0.00</span></div>
-            <div>💲 Total no PIX: <span>R$ 0.00</span></div>
+            <div>💰 Total Bruto: <span>R$ 0.00</span></div>
+            <div>💳 Total no Cartão: <span>R$ 0.00</span></div>
+            <div>💸 Total no Pix: <span>R$ 0.00</span></div>
         </div>
+
 
         <button id="copyButton" style="display: none;">Copiar Orçamentos</button>
     </div>
@@ -316,10 +317,11 @@
             document.getElementById('options').innerHTML = '';
             document.getElementById('selectedOrcamentos').innerHTML = '';
             document.getElementById('totals').innerHTML = `
-                <div>💰 Total: <span>R$ 0.00</span></div>
-                <div>🎉 Total Desconto: <span>R$ 0.00</span></div>
-                <div>💲 Total no PIX: <span>R$ 0.00</span></div>
+                <div>💰 Total Bruto: <span>R$ 0.00</span></div>
+                <div>💳 Total no Cartão: <span>R$ 0.00</span></div>
+                <div>💸 Total no Pix: <span>R$ 0.00</span></div>
             `;
+
             document.getElementById('results').style.display = 'none';
             document.getElementById('copyButton').style.display = 'none';
             if (!cdfil || !nrorc) {
@@ -355,7 +357,6 @@
             }, {});
             Object.keys(groupedData)
                 .sort((a, b) => {
-                    // extrai o último número após o último hífen e compara numericamente
                     const numA = parseInt(a.split('-').pop().trim());
                     const numB = parseInt(b.split('-').pop().trim());
                     return numA - numB;
@@ -468,7 +469,6 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
           }
         }
         
-
         if (temPortaria) {
           if (maiorValidade === 0 || validadeDias < maiorValidade) {
             maiorValidade = validadeDias;
@@ -501,8 +501,8 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
         message.insertAdjacentHTML("beforeend", `
             <strong>📝 Orçamento N:</strong> ${numero}<br><br>
             <strong>Fórmula Farmacêutica:</strong> ${item['Fórmula Farmacêutica']}<br>
-            Quantidade: <strong>${item['Quantidade']}</strong>  
-            Quantidade de Potes: <strong>${item['Quantidade Potes']}<br><br></strong> 
+            <strong>Quantidade:</strong> ${item['Quantidade']}  
+            <strong>Quantidade de Potes:</strong> ${item['Quantidade Potes']}<br><br> 
             <strong>📦 Fórmula Manipulada:</strong><br>${componentesHtml}<br><br>
             <strong>Bruto:</strong> R$ ${formattedBruto} 
             | <strong>Desconto:</strong> R$ ${formattedDesconto} 
@@ -519,25 +519,28 @@ ${componentesText}
 
 
 ${desconto > 0 ? 
-`Total: R$ ${formattedBruto} | Total de Descontos: R$ ${formattedDesconto} | Total no PIX: R$ ${formattedGeral}` : 
-`Total no PIX: R$ ${formattedGeral}`}
+`Total Bruto: R$ ${formattedBruto} | Total no Cartão: R$ ${formatter.format(bruto)} | Total no Pix (5% de desconto): R$ ${formatter.format(bruto * 0.95)}` : 
+`Total Bruto: R$ ${formattedBruto} | Total no Cartão: R$ ${formatter.format(bruto)} | Total no Pix (5% de desconto): R$ ${formatter.format(bruto * 0.95)}`}
+
 
 `;
     });
 
     if (totalDesconto > 0) {
-        copiedText += `
-Totais Consolidados:
-💰 TOTAL: R$ ${formatter.format(totalBruto)}
-🎉 TOTAL DE DESCONTOS: R$ ${formatter.format(totalDesconto)}
-💲 Total no PIX: R$ ${formatter.format(totalGeral)}
+    copiedText += `
+    Totais Consolidados:
+    💰 TOTAL BRUTO: R$ ${formatter.format(totalBruto)}
+    💳 TOTAL NO CARTÃO: R$ ${formatter.format(totalBruto)}
+    💸 TOTAL NO PIX (5% de desconto): R$ ${formatter.format(totalBruto * 0.95)}
 
-`;
+    `;
+
     } else {
         copiedText += `
 Totais Consolidados:
 💰 TOTAL: R$ ${formatter.format(totalBruto)}
-💲 Total no PIX: R$ ${formatter.format(totalGeral)}
+💳 Total no Cartão <span>R$ ${formatter.format(totalBruto)}
+💸 TOTAL NO PIX (5% de desconto): R$ ${formatter.format(totalBruto * 0.95)}
 
 `;
     }
@@ -553,10 +556,11 @@ Se for mais prático, você também pode enviar a receita digitalmente, desde qu
     copiedText += conclusionMessage;
 
     totalsContainer.innerHTML = `
-        <div>💰 Total: <span>R$ ${formatter.format(totalBruto)}</span></div>
-        <div>🎉 Total Desconto: <span>R$ ${formatter.format(totalDesconto)}</span></div>
-        <div>💲 Total no PIX: <span>R$ ${formatter.format(totalGeral)}</span></div>
+        <div>💰 Total Bruto: <span>R$ ${formatter.format(totalBruto)}</span></div>
+        <div>💳 Total no Cartão <span>R$ ${formatter.format(totalBruto)}</span></div>
+        <div>💸 Total no Pix (5% de desconto): <span>R$ ${formatter.format(totalBruto * 0.95)}</span></div>
     `;
+
 
     document.getElementById('copyButton').onclick = () => {
         let finalText = copiedText;
@@ -751,4 +755,3 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
-
