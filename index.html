@@ -521,8 +521,8 @@ ${componentesText}
 
 
 ${desconto > 0 ? 
-`Total Bruto: R$ ${formattedBruto} | Total no Cartão: R$ ${formatter.format(totalGeral)} | Total no Pix (5% de desconto): R$ ${formatter.format(totalGeral * 0.95)}` : 
-`Total Bruto: R$ ${formattedBruto} | Total no Cartão: R$ ${formatter.format(totalGeral)} | Total no Pix (5% de desconto): R$ ${formatter.format(totalGeral * 0.95)}`}
+`Total Bruto: R$ ${formattedBruto} | Total com Desconto no Cartão: R$ ${formatter.format(totalGeral)} | Total com desconto no PIX: R$ ${formatter.format(totalGeral * 0.95)}` : 
+`Total Bruto: R$ ${formattedBruto} | Total com Desconto no Cartão: R$ ${formatter.format(totalGeral)} | Total com desconto no PIX: R$ ${formatter.format(totalGeral * 0.95)}`}
 
 
 `;
@@ -530,10 +530,10 @@ ${desconto > 0 ?
 
     if (totalDesconto > 0) {
     copiedText += `
-    Totais Consolidados:
-    💰 TOTAL BRUTO: R$ ${formatter.format(totalBruto)}
-    💳 TOTAL NO CARTÃO: R$ ${formatter.format(totalGeral)}
-    💸 TOTAL NO PIX (5% de desconto): R$ ${formatter.format(totalGeral * 0.95)}
+Totais Consolidados:
+💰 TOTAL BRUTO: R$ ${formatter.format(totalBruto)}
+💳 TOTAL COM DESCONTO NO CARTÃO: R$ ${formatter.format(totalGeral)}
+💸 TOTAL COM DESCONTO NO PIX: R$ ${formatter.format(totalGeral * 0.95)}
 
     `;
 
@@ -541,8 +541,8 @@ ${desconto > 0 ?
         copiedText += `
 Totais Consolidados:
 💰 TOTAL: R$ ${formatter.format(totalBruto)}
-💳 Total no Cartão <span>R$ ${formatter.format(totalGeral)}
-💸 TOTAL NO PIX (5% de desconto): R$ ${formatter.format(totalGeral * 0.95)}
+💳 TOTAL COM DESCONTO NO CARTÃO: <span>R$ ${formatter.format(totalGeral)}
+💸 TOTAL COM DESCONTO NO PIX: R$ ${formatter.format(totalGeral * 0.95)}
 
 `;
     }
@@ -559,8 +559,8 @@ Se for mais prático, você também pode enviar a receita digitalmente, desde qu
 
     totalsContainer.innerHTML = `
         <div>💰 Total Bruto: <span>R$ ${formatter.format(totalBruto)}</span></div>
-        <div>💳 Total no Cartão <span>R$ ${formatter.format(totalGeral)}</span></div>
-        <div>💸 Total no Pix (5% de desconto): <span>R$ ${formatter.format(totalGeral * 0.95)}</span></div>
+        <div>💳 Total com Desconto no Cartão: <span>R$ ${formatter.format(totalGeral)}</span></div>
+        <div>💸 Total com Desconto no PIX: <span>R$ ${formatter.format(totalGeral * 0.95)}</span></div>
     `;
 
 
