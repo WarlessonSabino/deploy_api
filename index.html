@@ -142,7 +142,7 @@
         #calculator.expanded .calculator-content {
             display: block;
         }
-
+        
         .calculator-header {
             display: flex;
             justify-content: flex-end;
@@ -150,7 +150,7 @@
             margin-bottom: 10px;
             width: 100%;
         }
-
+        
         .calculator-title {
             margin: 0;
             font-size: 18px;
@@ -159,13 +159,13 @@
             text-align: center;
             color: #333;
         }
-
+        
         .calculator-buttons {
             display: flex;
             align-items: center;
             gap: 8px;
         }
-
+        
         #addRecommendation {
             background: #ff9800;
             color: #fff;
@@ -181,11 +181,11 @@
             justify-content: center;
             transition: background 0.2s;
         }
-
+        
         #addRecommendation:hover {
             background: #ffb84d;
         }
-
+        
         #closeCalculator {
             background: #dc3545;
             color: #fff;
@@ -201,17 +201,17 @@
             justify-content: center;
             transition: background 0.2s;
         }
-
+        
         #closeCalculator:hover {
             background: #c82333;
         }
-
+        
         .calculator-action-buttons {
             display: flex;
             gap: 10px;
             margin-top: 15px;
         }
-
+        
         .calculator-action-buttons button {
             flex: 1;
             padding: 10px;
@@ -245,10 +245,12 @@
         <div id="selectedOrcamentos"></div>
 
         <div class="totals" id="totals">
-            <div>💰 Total: <span>R$ 0.00</span></div>
+            <div>💰 Total Bruto: <span>R$ 0.00</span></div>
             <div>🎉 Total Desconto: <span>R$ 0.00</span></div>
-            <div>💲 Total no PIX: <span>R$ 0.00</span></div>
+            <div>💳 Total no Cartão: <span>R$ 0.00</span></div>
+            <div>💸 Total no Pix: <span>R$ 0.00</span></div>
         </div>
+
 
         <button id="copyButton" style="display: none;">Copiar Orçamentos</button>
     </div>
@@ -262,7 +264,7 @@
                     <button id="closeCalculator" title="Fechar calculadora">×</button>
                 </div>
             </div>
-
+            
             <div class="form-group">
                 <label style="font-size: 18px; font-weight: 600; display: block; margin-bottom: 15px; color: #333;">Calculadora de Preço</label>
                 <label for="currentTreatment">Tempo de Tratamento Atual:</label>
@@ -282,11 +284,11 @@
                     <option value="120">120 dias</option>
                 </select>
             </div>
-
+            
             <div class="calculator-action-buttons">
                 <button id="calculatePrice">Calcular</button>
             </div>
-
+            
             <div id="calculationResult"></div>
             <div id="recommendationPreview" style="margin-top:12px; font-style:italic; color:#007bff;"></div>
         </div>
@@ -316,10 +318,12 @@
             document.getElementById('options').innerHTML = '';
             document.getElementById('selectedOrcamentos').innerHTML = '';
             document.getElementById('totals').innerHTML = `
-                <div>💰 Total: <span>R$ 0.00</span></div>
+                <div>💰 Total Bruto: <span>R$ 0.00</span></div>
                 <div>🎉 Total Desconto: <span>R$ 0.00</span></div>
-                <div>💲 Total no PIX: <span>R$ 0.00</span></div>
+                <div>💳 Total no Cartão: <span>R$ 0.00</span></div>
+                <div>💸 Total no Pix: <span>R$ 0.00</span></div>
             `;
+
             document.getElementById('results').style.display = 'none';
             document.getElementById('copyButton').style.display = 'none';
             if (!cdfil || !nrorc) {
@@ -355,7 +359,6 @@
             }, {});
             Object.keys(groupedData)
                 .sort((a, b) => {
-                    // extrai o último número após o último hífen e compara numericamente
                     const numA = parseInt(a.split('-').pop().trim());
                     const numB = parseInt(b.split('-').pop().trim());
                     return numA - numB;
@@ -424,8 +427,6 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
         selectedContainer.appendChild(recomendDiv);
     }
 
-    let maiorValidade = 0; // armazenar o menor prazo (10 ou 30 dias)
-    let temPortaria = false; // flag de controle
     let maiorValidade = 0; 
     let temPortaria = false; 
 
@@ -452,26 +453,24 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
 
 
         let validadeDias = 0;
-
+        
         for (const det of detalhes) {
           const portaria = (det['Portaria'] || '').toUpperCase().trim();
           if (!portaria) continue;
-
+        
           if (/^C[1-5]$/.test(portaria) || /^B[1-2]$/.test(portaria) || /^A[1-3]$/.test(portaria)) {
             validadeDias = 30;
             temPortaria = true;
             break;
           }
-
+        
           if (portaria === 'AM') {
             validadeDias = 10;
             temPortaria = true;
             break;
           }
         }
-
-        // usa o menor prazo encontrado (10 dias tem prioridade)
-
+        
         if (temPortaria) {
           if (maiorValidade === 0 || validadeDias < maiorValidade) {
             maiorValidade = validadeDias;
@@ -506,8 +505,6 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
             <strong>Fórmula Farmacêutica:</strong> ${item['Fórmula Farmacêutica']}<br>
             <strong>Quantidade:</strong> ${item['Quantidade']}  
             <strong>Quantidade de Potes:</strong> ${item['Quantidade Potes']}<br><br> 
-            Quantidade: <strong>${item['Quantidade']}</strong>  
-            Quantidade de Potes: <strong>${item['Quantidade Potes']}<br><br></strong> 
             <strong>📦 Fórmula Manipulada:</strong><br>${componentesHtml}<br><br>
             <strong>Bruto:</strong> R$ ${formattedBruto} 
             | <strong>Desconto:</strong> R$ ${formattedDesconto} 
@@ -524,25 +521,28 @@ ${componentesText}
 
 
 ${desconto > 0 ? 
-`Total: R$ ${formattedBruto} | Total de Descontos: R$ ${formattedDesconto} | Total no PIX: R$ ${formattedGeral}` : 
-`Total no PIX: R$ ${formattedGeral}`}
+`Total Bruto: R$ ${formattedBruto} | Total no Cartão: R$ ${formatter.format(totalGeral)} | Total no Pix (5% de desconto): R$ ${formatter.format(totalGeral * 0.95)}` : 
+`Total Bruto: R$ ${formattedBruto} | Total no Cartão: R$ ${formatter.format(totalGeral)} | Total no Pix (5% de desconto): R$ ${formatter.format(totalGeral * 0.95)}`}
+
 
 `;
     });
 
     if (totalDesconto > 0) {
-        copiedText += `
-Totais Consolidados:
-💰 TOTAL: R$ ${formatter.format(totalBruto)}
-🎉 TOTAL DE DESCONTOS: R$ ${formatter.format(totalDesconto)}
-💲 Total no PIX: R$ ${formatter.format(totalGeral)}
+    copiedText += `
+    Totais Consolidados:
+    💰 TOTAL BRUTO: R$ ${formatter.format(totalBruto)}
+    💳 TOTAL NO CARTÃO: R$ ${formatter.format(totalGeral)}
+    💸 TOTAL NO PIX (5% de desconto): R$ ${formatter.format(totalGeral * 0.95)}
 
-`;
+    `;
+
     } else {
         copiedText += `
 Totais Consolidados:
 💰 TOTAL: R$ ${formatter.format(totalBruto)}
-💲 Total no PIX: R$ ${formatter.format(totalGeral)}
+💳 Total no Cartão <span>R$ ${formatter.format(totalGeral)}
+💸 TOTAL NO PIX (5% de desconto): R$ ${formatter.format(totalGeral * 0.95)}
 
 `;
     }
@@ -558,10 +558,11 @@ Se for mais prático, você também pode enviar a receita digitalmente, desde qu
     copiedText += conclusionMessage;
 
     totalsContainer.innerHTML = `
-        <div>💰 Total: <span>R$ ${formatter.format(totalBruto)}</span></div>
-        <div>🎉 Total Desconto: <span>R$ ${formatter.format(totalDesconto)}</span></div>
-        <div>💲 Total no PIX: <span>R$ ${formatter.format(totalGeral)}</span></div>
+        <div>💰 Total Bruto: <span>R$ ${formatter.format(totalBruto)}</span></div>
+        <div>💳 Total no Cartão <span>R$ ${formatter.format(totalGeral)}</span></div>
+        <div>💸 Total no Pix (5% de desconto): <span>R$ ${formatter.format(totalGeral * 0.95)}</span></div>
     `;
+
 
     document.getElementById('copyButton').onclick = () => {
         let finalText = copiedText;
@@ -618,11 +619,11 @@ Se for mais prático, você também pode enviar a receita digitalmente, desde qu
             const tempoTratamentoAtual = parseInt(document.getElementById('currentTreatment').value);
             const simularPara = parseInt(document.getElementById('simulateFor').value);
             lastSimulateDias = simularPara;
-
+            
             const totalGeral = parseFloat(document.querySelectorAll('#totals span')[2].innerText.replace('R$', '').replace('.', '').replace(',', '.'));
-
+            
             const numeroOrcamentos = document.querySelectorAll('.orcamento-checkbox:checked').length;
-
+            
             if (numeroOrcamentos === 0) {
                 alert('Selecione pelo menos um orçamento para calcular.');
                 return;
@@ -662,19 +663,19 @@ if (tempoTratamentoAtual === 30) {
 
             const precoCalculado = totalGeral * multiplicador / multiplicadorMes;
             const valorTotal = precoCalculado * multiplicadorMes;
-
+            
             const descontoAplicado = (tempoTratamentoAtual === simularPara) ? 
                 0 : 
                 Math.abs((totalGeral * (simularPara / tempoTratamentoAtual)) - valorTotal);
-
+            
             const ticketMedioAtual = totalGeral / numeroOrcamentos;
             const ticketMedioNovo = valorTotal / numeroOrcamentos;
             const percentualAumento = ((ticketMedioNovo - ticketMedioAtual) / ticketMedioAtual) * 100;
-
+            
             let ticketMedioMsg = '';
             let ticketMedioIcon = '';
             let ticketMedioStyle = '';
-
+            
             if (percentualAumento > 0) {
                 ticketMedioIcon = '📈';
                 ticketMedioStyle = 'color: #28a745; font-weight: bold;';
@@ -688,7 +689,7 @@ if (tempoTratamentoAtual === 30) {
                 ticketMedioStyle = 'color: #6c757d; font-weight: bold;';
                 ticketMedioMsg = `${ticketMedioIcon} <span style="${ticketMedioStyle}">Ticket médio mantido: R$ ${formatter.format(ticketMedioAtual.toFixed(2))}</span>`;
             }
-
+            
             document.getElementById('calculationResult').innerHTML = `
                 <p><strong>💰 Valor Total:</strong> R$ ${formatter.format(valorTotal.toFixed(2))}</p>
                 <p><strong>📆 Valor por Mês:</strong> R$ ${formatter.format(precoCalculado.toFixed(2))}</p>
@@ -707,7 +708,7 @@ if (tempoTratamentoAtual === 30) {
                     <small style="color: #6c757d; font-size: 11px;">Ticket médio • ${numeroOrcamentos} orçamento${numeroOrcamentos > 1 ? 's' : ''}</small>
                 </div>
             `;
-
+            
             if (tempoTratamentoAtual === simularPara) {
                 lastRecommendation = `Mantendo ${simularPara} dias, o valor permanece R$ ${formatter.format(valorTotal.toFixed(2))}.`;
             } else if (percentualAumento > 0) {
