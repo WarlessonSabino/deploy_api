@@ -424,8 +424,6 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
         selectedContainer.appendChild(recomendDiv);
     }
 
-    let maiorValidade = 0; // armazenar o menor prazo (10 ou 30 dias)
-    let temPortaria = false; // flag de controle
     let maiorValidade = 0; 
     let temPortaria = false; 
 
@@ -506,8 +504,6 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
             <strong>Fórmula Farmacêutica:</strong> ${item['Fórmula Farmacêutica']}<br>
             <strong>Quantidade:</strong> ${item['Quantidade']}  
             <strong>Quantidade de Potes:</strong> ${item['Quantidade Potes']}<br><br> 
-            Quantidade: <strong>${item['Quantidade']}</strong>  
-            Quantidade de Potes: <strong>${item['Quantidade Potes']}<br><br></strong> 
             <strong>📦 Fórmula Manipulada:</strong><br>${componentesHtml}<br><br>
             <strong>Bruto:</strong> R$ ${formattedBruto} 
             | <strong>Desconto:</strong> R$ ${formattedDesconto} 
@@ -755,3 +751,4 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
+
