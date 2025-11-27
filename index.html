@@ -516,12 +516,13 @@ Fórmula Manipulada:
 ${componentesText}
 
 
-${desconto > 0 
-    ? `Total Bruto: R$ ${formattedBruto} | Total com Desconto Black Friday: R$ ${formatter.format(totalGeral)}`
-    : `Total Bruto: R$ ${formattedBruto} | Total com Desconto Black Friday: R$ ${formatter.format(totalGeral)}`
-};
+${desconto > 0 ? 
+`Total: R$ ${formattedBruto} | Total com Desconto Black Friday: R$ ${formattedGeral}` : 
+`Total com Desconto Black Friday: R$ ${formattedGeral}`}
 
-
+`;
+    });
+    
     if (totalDesconto > 0) {
     copiedText += `
 Totais Consolidados:
@@ -746,6 +747,7 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
+
 
 
 
