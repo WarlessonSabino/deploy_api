@@ -424,6 +424,8 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
         selectedContainer.appendChild(recomendDiv);
     }
 
+    let maiorValidade = 0; // armazenar o menor prazo (10 ou 30 dias)
+    let temPortaria = false; // flag de controle
     let maiorValidade = 0; 
     let temPortaria = false; 
 
@@ -504,6 +506,8 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
             <strong>Fórmula Farmacêutica:</strong> ${item['Fórmula Farmacêutica']}<br>
             <strong>Quantidade:</strong> ${item['Quantidade']}  
             <strong>Quantidade de Potes:</strong> ${item['Quantidade Potes']}<br><br> 
+            Quantidade: <strong>${item['Quantidade']}</strong>  
+            Quantidade de Potes: <strong>${item['Quantidade Potes']}<br><br></strong> 
             <strong>📦 Fórmula Manipulada:</strong><br>${componentesHtml}<br><br>
             <strong>Bruto:</strong> R$ ${formattedBruto} 
             | <strong>Desconto:</strong> R$ ${formattedDesconto} 
@@ -520,8 +524,8 @@ ${componentesText}
 
 
 ${desconto > 0 ? 
-`Total: R$ ${formattedBruto} | Total com Desconto Black Friday: R$ ${formattedGeral}` : 
-`Total com Desconto Black Friday: R$ ${formattedGeral}`}
+`Total: R$ ${formattedBruto} | Total de Descontos: R$ ${formattedDesconto} | Total no PIX: R$ ${formattedGeral}` : 
+`Total no PIX: R$ ${formattedGeral}`}
 
 `;
     });
@@ -531,14 +535,14 @@ ${desconto > 0 ?
 Totais Consolidados:
 💰 TOTAL: R$ ${formatter.format(totalBruto)}
 🎉 TOTAL DE DESCONTOS: R$ ${formatter.format(totalDesconto)}
-🏷️🖤 Total com Desconto Black Friday: R$ ${formatter.format(totalGeral)}
+💲 Total no PIX: R$ ${formatter.format(totalGeral)}
 
 `;
     } else {
         copiedText += `
 Totais Consolidados:
 💰 TOTAL: R$ ${formatter.format(totalBruto)}
-🏷️🖤 Total com Desconto Black Friday: R$ ${formatter.format(totalGeral)}
+💲 Total no PIX: R$ ${formatter.format(totalGeral)}
 
 `;
     }
@@ -555,7 +559,8 @@ Se for mais prático, você também pode enviar a receita digitalmente, desde qu
 
     totalsContainer.innerHTML = `
         <div>💰 Total: <span>R$ ${formatter.format(totalBruto)}</span></div>
-        <div>🏷️🖤 Total com Desconto Black Friday: <span>R$ ${formatter.format(totalGeral)}</span></div>
+        <div>🎉 Total Desconto: <span>R$ ${formatter.format(totalDesconto)}</span></div>
+        <div>💲 Total no PIX: <span>R$ ${formatter.format(totalGeral)}</span></div>
     `;
 
     document.getElementById('copyButton').onclick = () => {
@@ -751,4 +756,3 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
-
