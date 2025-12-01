@@ -246,7 +246,9 @@
 
         <div class="totals" id="totals">
             <div>💰 Total Bruto: <span>R$ 0.00</span></div>
-            <div>🏷️💸🖤 Total com Desconto Black Friday:  <span>R$ 0.00</span></div>
+            <div>🎉 Total Desconto: <span>R$ 0.00</span></div>
+            <div>💳 Total no Cartão: <span>R$ 0.00</span></div>
+            <div>💸 Total no Pix: <span>R$ 0.00</span></div>
         </div>
 
 
@@ -317,7 +319,9 @@
             document.getElementById('selectedOrcamentos').innerHTML = '';
             document.getElementById('totals').innerHTML = `
                 <div>💰 Total Bruto: <span>R$ 0.00</span></div>
-                <div>🏷️💸🖤 Total com Desconto Black Friday: <span>R$ 0.00</span></div>
+                <div>🎉 Total Desconto: <span>R$ 0.00</span></div>
+                <div>💳 Total no Cartão: <span>R$ 0.00</span></div>
+                <div>💸 Total no Pix: <span>R$ 0.00</span></div>
             `;
 
             document.getElementById('results').style.display = 'none';
@@ -517,8 +521,8 @@ ${componentesText}
 
 
 ${desconto > 0 ? 
-`Total: R$ ${formattedBruto} | Total com Desconto Black Friday: R$ ${formattedGeral}` : 
-`Total com Desconto Black Friday: R$ ${formattedGeral}`}
+`Total Bruto: R$ ${formattedBruto}` : 
+`Total Bruto: R$ ${formattedBruto}`}
 
 `;
     });
@@ -527,14 +531,17 @@ ${desconto > 0 ?
     copiedText += `
 Totais Consolidados:
 💰 TOTAL BRUTO: R$ ${formatter.format(totalBruto)}
-🏷️💸🖤 *TOTAL COM DESCONTO BLACK FRIDAY: R$ ${formatter.format(totalGeral)}*
+💳 TOTAL COM DESCONTO NO CARTÃO: R$ ${formatter.format(totalGeral)}
+💸 TOTAL COM DESCONTO NO PIX: R$ ${formatter.format(Number((totalGeral * 0.95).toFixed(2)))}
     `;
 
     } else {
         copiedText += `
 Totais Consolidados:
 💰 TOTAL: R$ ${formatter.format(totalBruto)}
-🏷️💸🖤 *TOTAL COM DESCONTO BLACK FRIDAY: R$ ${formatter.format(totalGeral)}*
+💳 TOTAL COM DESCONTO NO CARTÃO: <span>R$ ${formatter.format(totalGeral)}
+💸 TOTAL COM DESCONTO NO PIX: R$ ${formatter.format((totalGeral * 0.95).toFixed(2))}
+
 `;
     }
 
@@ -550,7 +557,8 @@ Se for mais prático, você também pode enviar a receita digitalmente, desde qu
 
     totalsContainer.innerHTML = `
         <div>💰 Total Bruto: <span>R$ ${formatter.format(totalBruto)}</span></div>
-        <div>🏷️💸🖤 Total com Desconto Black Friday: <span>R$ ${formatter.format(totalGeral)}</span></div>
+        <div>💳 Total com Desconto no Cartão: <span>R$ ${formatter.format(totalGeral)}</span></div>
+        <div>💸 Total com Desconto no PIX: <span>R$ ${formatter.format(Number((totalGeral * 0.95).toFixed(2)))}</span></div>
     `;
 
 
@@ -747,6 +755,7 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
+
 
 
 
