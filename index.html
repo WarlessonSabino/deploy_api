@@ -441,6 +441,11 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
         const componentesHtml = componentesArray.join('<br>');
         const componentesText = componentesArray.join('\n');
         const item = detalhes[0];
+
+        const tipoCapsula = item['Tipo_Capsula'] || '';
+        const tipoCapsulaHtml = tipoCapsula ? `<strong>Tipo de Cápsula:</strong> ${tipoCapsula}<br>` : '';
+        const tipoCapsulaLinha = tipoCapsula ? 'Tipo de cápsula: ' + tipoCapsula : '';
+
         const bruto = parseFloat(item['Valor_Bruto']);
         const desconto = parseFloat(item['Valor_Desconto']);
         const geral = parseFloat(item['Valor a Pagar']);
@@ -503,6 +508,7 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
         message.insertAdjacentHTML("beforeend", `
             <strong>📝 Orçamento N:</strong> ${numero}<br><br>
             <strong>Fórmula Farmacêutica:</strong> ${item['Fórmula Farmacêutica']}<br>
+            ${tipoCapsulaHtml}
             <strong>Quantidade:</strong> ${item['Quantidade']}  
             <strong>Quantidade de Potes:</strong> ${item['Quantidade Potes']}<br><br> 
             <strong>📦 Fórmula Manipulada:</strong><br>${componentesHtml}<br><br>
@@ -515,6 +521,7 @@ Qualquer dúvida, estamos prontos para ajudar! Conte conosco para sua saúde e b
 
         copiedText += `
 📝 ORC:${formattedNumero} | Quantidade: ${item['Quantidade']} | Potes: ${item['Quantidade Potes']}
+${tipoCapsulaLinha ? tipoCapsulaLinha + '\n' : ''}
 
 Fórmula Manipulada:
 ${componentesText}
@@ -755,13 +762,3 @@ if (tempoTratamentoAtual === 30) {
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
