@@ -325,7 +325,9 @@ app.get('/requisicoes', (req, res) => {
             CASE 
               WHEN fc03000.cdpro IN (3721, 50260) THEN NULL 
               ELSE fc03000.porta 
-            END AS "Portaria"
+            END AS "Portaria",
+
+            fc0h000.descricao AS "Tipo_Capsula"
 
             FROM
                 fc15100
@@ -339,6 +341,9 @@ app.get('/requisicoes', (req, res) => {
 
             LEFT JOIN
             fc03200 on fc03200.cdsin = fc15110.cdpro
+
+            LEFT JOIN
+            fc0h000 on fc0h000.tpcapsula = fc15100.tpcap
 
 
             WHERE
@@ -376,6 +381,7 @@ app.get('/requisicoes', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
