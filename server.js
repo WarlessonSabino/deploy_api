@@ -328,9 +328,12 @@ app.get('/requisicoes', (req, res) => {
             END AS "Portaria",
 
             CASE
-            WHEN fc15100.tpformafarma = 1 THEN fc0h000.descricao
-            ELSE  NULL
-            END AS "Tipo_Capsula"
+                WHEN fc15100.tpformafarma = 1
+                     AND fc0h000.idtipocap <> 9
+                THEN fc0h000.descricao
+                ELSE NULL
+            END AS Tipo_Capsula
+
 
             FROM
                 fc15100
@@ -384,6 +387,7 @@ app.get('/requisicoes', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
