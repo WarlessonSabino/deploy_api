@@ -384,9 +384,62 @@ app.get('/requisicoes', (req, res) => {
     });
 });
 
+app.get('/visitas', (req, res) => {
+    const { nrcrm, ufcrm, dtage } = req.query;
+
+    if (!nrcrm || !ufcrm || !dtage) {
+        return res.status(400).send('Parâmetros nrcrm, ufcrm e dtage são obrigatórios');
+    }
+
+    const options = dbConfig;
+
+    Firebird.attach(options, (err, db) => {
+        if (err) {
+            return res.status(500).send('Erro ao conectar ao banco de dados');
+        }
+
+        const sqlQuery = `
+            SELECT
+                CAST(fc04A00.agendaid AS VARCHAR(55)) AS agendaid,
+                (fc04a00.nrcrm || '-' || fc04a00.ufcrm) AS "N° CRM",
+                (fc04a00.pfcrm || fc04a00.ufcrm || fc04a00.nrcrm) AS ID_Unico,
+                fc04a00.dtage AS data_realizada,
+                CAST(fc04a00.hrvisitaini AS TIME) AS hora_realizada,
+                CAST(fc04a00.obsagenda AS VARCHAR(8191)) AS obsagenda,
+                CAST(fc04a00.obsvisita AS VARCHAR(8191)) AS obsvisita,
+                fc04a00.cdfun AS cd_visitador,
+                CASE
+                    WHEN fc04a00.situacao = 4 THEN 'Remarcado'
+                    WHEN fc04a00.situacao = 2 THEN 'Realizado'
+                    WHEN fc04a00.situacao = 1 THEN 'Agendado'
+                    ELSE 'Removido'
+                END AS situacao
+            FROM FC04A00
+            WHERE fc04a00.nrcrm = ?
+              AND fc04a00.ufcrm = ?
+              AND fc04a00.dtage = ?
+        `;
+
+        db.query(sqlQuery, [nrcrm, ufcrm, dtage], (err, result) => {
+            db.detach();
+
+            if (err) {
+                return res.status(500).send('Erro ao executar a consulta');
+            }
+
+            if (!result || result.length === 0) {
+                return res.status(404).send('Nenhuma visita encontrada');
+            }
+
+            return res.json(result);
+        });
+    });
+});
+
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
