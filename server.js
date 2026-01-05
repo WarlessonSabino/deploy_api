@@ -436,9 +436,100 @@ app.get('/visitas', (req, res) => {
     });
 });
 
+app.get('/requisicoes-cliente', (req, res) => {
+    const { cpfclientedav } = req.query;
+
+    if (!cpfclientedav) {
+        return res.status(400).send('Parâmetro cpfclientedav é obrigatório');
+    }
+
+    Firebird.attach(dbConfig, (err, db) => {
+        if (err) {
+            return res.status(500).send('Erro ao conectar ao banco de dados');
+        }
+
+        const sqlQuery = `
+            SELECT FIRST 5
+                (fc.cdfil || ' - ' || fc.nrrqu) AS PROTOCOLO,
+                fc.dtentr AS DATA_PEDIDO,
+                CASE 
+                    WHEN fc.tpformafarma = 6 THEN 'Produto de Revenda'
+                    ELSE 'Fórmula Manipulada'
+                END AS TIPO
+            FROM fc12100 fc
+            WHERE fc.cpfclientedav = ?
+            ORDER BY fc.dtentr DESC
+        `;
+
+        db.query(sqlQuery, [cpfclientedav], (err, result) => {
+            db.detach();
+
+            if (err) {
+                return res.status(500).send('Erro ao executar a consulta');
+            }
+
+            if (!result || result.length === 0) {
+                return res.status(404).send('Nenhuma requisição encontrada');
+            }
+
+            return res.json(result);
+        });
+    });
+});
+
+app.get('/componentes-req', (req, res) => {
+    const { cdfil, nrrqu } = req.query;
+
+    if (!cdfil || !nrrqu) {
+        return res.status(400).send('Parâmetros cdfil e nrrqu são obrigatórios');
+    }
+
+    Firebird.attach(dbConfig, (err, db) => {
+        if (err) {
+            return res.status(500).send('Erro ao conectar ao banco de dados');
+        }
+
+        const sqlQuery = `
+            SELECT
+                p.descrprd AS PRODUTO,
+                cf.quant AS QUANTIDADE,
+                cf.unida AS UNIDADE,
+                f.posol AS POSOLOGIA
+            FROM fc12110 cf
+            INNER JOIN fc12100 f 
+                ON f.cdfil = cf.cdfil 
+               AND f.nrrqu = cf.nrrqu
+            INNER JOIN fc03000 p 
+                ON p.cdpro = cf.cdprin
+            WHERE cf.cdfil = ?
+              AND cf.nrrqu = ?
+              AND cf.tpcmp = 'C'
+            ORDER BY cf.itemid ASC
+        `;
+
+        db.query(sqlQuery, [cdfil, nrrqu], (err, result) => {
+            db.detach();
+
+            if (err) {
+                return res.status(500).send('Erro ao executar a consulta');
+            }
+
+            if (!result || result.length === 0) {
+                return res.status(404).send('Nenhum componente encontrado');
+            }
+
+            return res.json(result);
+        });
+    });
+});
+
+
+
+
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
