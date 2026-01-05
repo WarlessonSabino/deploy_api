@@ -457,7 +457,11 @@ app.get('/requisicoes-cliente', (req, res) => {
                     ELSE 'Fórmula Manipulada'
                 END AS TIPO
             FROM fc12100 fc
-            WHERE fc.cpfclientedav = ?
+
+            INNER JOIN
+            fc07000 c ON c.cdcli = fc.cdcli   
+            
+            WHERE c.nrcnpj = ?
             ORDER BY fc.dtentr DESC
         `;
 
@@ -529,6 +533,7 @@ app.get('/componentes-req', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
