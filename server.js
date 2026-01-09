@@ -334,7 +334,8 @@ app.get('/requisicoes', (req, res) => {
                 ELSE NULL
             END AS Tipo_Capsula,
 
-            (fc04000.nrcrm || '-' || fc04000.ufcrm || ' - ' || fc04000.nomemed) AS MEDICO,
+            (fc04000.nrcrm || '-' || fc04000.ufcrm ) AS CRM,
+            fc04000.nomemed AS MEDICO,
 
              fc08000.nomefun AS VENDEDOR
     
@@ -543,6 +544,7 @@ app.get('/componentes-req', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
