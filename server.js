@@ -538,12 +538,76 @@ app.get('/componentes-req', (req, res) => {
     });
 });
 
+app.get('/orcamentos_rejeitados', (req, res) => {
+  Firebird.attach(dbConfig, (err, db) => {
+    if (err) {
+      return res.status(500).send('Erro ao conectar ao banco de dados');
+    }
 
+    const sqlQuery = `
+      SELECT
+        f.cdfil,
+        SUM(f.prcobr - f.vrdsc) AS Total
+      FROM fc15100 f
+      WHERE f.dtentr = current_date
+        AND f.qtaprov = 0
+      GROUP BY f.cdfil
+    `;
+
+    db.query(sqlQuery, [], (err, result) => {
+      db.detach();
+
+      if (err) {
+        return res.status(500).send('Erro ao executar a consulta');
+      }
+
+      if (!result || result.length === 0) {
+        return res.status(404).send('Nenhum registro encontrado');
+      }
+
+      return res.json(result);
+    });
+  });
+});
+
+
+app.get('/vendas_unidade', (req, res) => {
+  Firebird.attach(dbConfig, (err, db) => {
+    if (err) {
+      return res.status(500).send('Erro ao conectar ao banco de dados');
+    }
+
+    const sqlQuery = `
+      SELECT
+        f.cdfil,
+        COUNT(DISTINCT f.nrrqu) AS Req,
+        SUM(f.prcobr - f.vrdsc) AS Total
+      FROM fc12100 f
+      WHERE f.dtentr = current_date
+      GROUP BY f.cdfil
+    `;
+
+    db.query(sqlQuery, [], (err, result) => {
+      db.detach();
+
+      if (err) {
+        return res.status(500).send('Erro ao executar a consulta');
+      }
+
+      if (!result || result.length === 0) {
+        return res.status(404).send('Nenhum registro encontrado');
+      }
+
+      return res.json(result);
+    });
+  });
+});
 
 
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
