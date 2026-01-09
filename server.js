@@ -332,8 +332,13 @@ app.get('/requisicoes', (req, res) => {
                      AND fc0h000.idtipocap <> 9
                 THEN fc0h000.descricao
                 ELSE NULL
-            END AS Tipo_Capsula
+            END AS Tipo_Capsula,
+            
+            (fc04000.nrcrm || '-' || fc04000.ufcrm || '-' || fc04000.nomemed) AS MEDICO,
 
+
+            (fc08000.cdfun || '-' || fc08000.nomefun) AS VENDEDOR 
+    
 
             FROM
                 fc15100
@@ -350,6 +355,12 @@ app.get('/requisicoes', (req, res) => {
 
             LEFT JOIN
             fc0h000 on fc0h000.tpcapsula = fc15100.tpcap
+
+            LEFT JOIN
+            fc08000 ON fc08000.cdcon = fc15100.cdconre AND fc08000.cdfun = fc15100.cdfunre
+
+            LEFT JOIN
+            fc04000 ON fc04000.ufcrm = fc15100.ufcrm AND fc04000.nrcrm = fc15100.nrcrm AND fc04000.pfcrm = fc15100.pfcrm
 
 
             WHERE
@@ -533,6 +544,7 @@ app.get('/componentes-req', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
