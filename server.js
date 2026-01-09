@@ -332,7 +332,7 @@ app.get('/requisicoes', (req, res) => {
                      AND fc0h000.idtipocap <> 9
                 THEN fc0h000.descricao
                 ELSE NULL
-            END AS Tipo_Capsula,
+            END AS Tipo_Capsula
     
 
             FROM
@@ -533,6 +533,7 @@ app.get('/componentes-req', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
