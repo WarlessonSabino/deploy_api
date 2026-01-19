@@ -603,15 +603,75 @@ app.get('/vendas_unidade', (req, res) => {
   });
 });
 
+app.get('/romaneios-dia', (req, res) => {
+
+  Firebird.attach(dbConfig, (err, db) => {
+    if (err) return res.status(500).send('Erro ao conectar ao banco de dados');
+
+    const sqlQuery = `
+      SELECT 
+        (r.cdfilentg || '-' || r.nrentg) AS romaneio,
+        r.dtentg,
+        r.hrentg,
+        r.obsentg,
+        (r.ender || ', ' || r.endnr || ' ' || COALESCE(r.endcp, 'N/A') || ' - ' || r.bairr || ', ' || r.munic || ' - ' || r.unfed || ', ' || COALESCE(r.nrcep, 'N/A')) AS endereco_entrega,
+        (r.nrddd || ' '  || r.nrtel) AS tel
+      FROM fc12400 r
+      WHERE r.dtentg = current_date
+    `;
+
+    db.query(sqlQuery, [], (err, result) => {
+      db.detach();
+      if (err) return res.status(500).send('Erro ao executar a consulta');
+      if (!result || result.length === 0) return res.status(404).send('Nenhum romaneio encontrado hoje');
+      return res.json(result);
+    });
+  });
+
+});
+
+app.get('/itens-romaneio', (req, res) => {
+  const { cdfilentg, nrentg } = req.query;
+
+  if (!cdfilentg || !nrentg) {
+    return res.status(400).send('Parâmetros cdfilentg e nrentg são obrigatórios');
+  }
+
+  Firebird.attach(dbConfig, (err, db) => {
+    if (err) return res.status(500).send('Erro ao conectar ao banco de dados');
+
+    const sqlQuery = `
+      SELECT
+        (dr.cdfilr || '-' || dr.cdpro) AS requisicao,
+        dr.vrliq,
+        c.cdcli,
+        c.nomecli
+      FROM fc12410 dr
+
+      INNER JOIN fc12100 req 
+        ON req.cdfil = dr.cdfilr 
+       AND req.nrrqu = dr.cdpro
+
+      INNER JOIN fc07000 c 
+        ON c.cdcli = req.cdcli
+
+      WHERE dr.cdfilentg = ?
+        AND dr.nrentg = ?
+    `;
+
+    db.query(sqlQuery, [cdfilentg, nrentg], (err, result) => {
+      db.detach();
+      if (err) return res.status(500).send('Erro ao executar a consulta');
+      if (!result || result.length === 0) return res.status(404).send('Nenhum item encontrado para o romaneio');
+      return res.json(result);
+    });
+  });
+});
+
 
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
-
-
-
-
-
 
 
 
