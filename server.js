@@ -603,7 +603,7 @@ app.get('/vendas_unidade', (req, res) => {
   });
 });
 
-app.get('/romaneios-dia', (req, res) => {
+app.get('/romaneios_dia', (req, res) => {
 
   Firebird.attach(dbConfig, (err, db) => {
     if (err) return res.status(500).send('Erro ao conectar ao banco de dados');
@@ -630,7 +630,7 @@ app.get('/romaneios-dia', (req, res) => {
 
 });
 
-app.get('/itens-romaneio', (req, res) => {
+app.get('/itens_romaneio', (req, res) => {
   const { cdfilentg, nrentg } = req.query;
 
   if (!cdfilentg || !nrentg) {
@@ -672,6 +672,7 @@ app.get('/itens-romaneio', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
