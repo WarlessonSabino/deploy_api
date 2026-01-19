@@ -609,15 +609,28 @@ app.get('/romaneios_dia', (req, res) => {
     if (err) return res.status(500).send('Erro ao conectar ao banco de dados');
 
     const sqlQuery = `
-      SELECT 
-        (r.cdfilentg || '-' || r.nrentg) AS romaneio,
-        r.dtentg,
-        r.hrentg,
-        r.obsentg,
-        (r.ender || ', ' || r.endnr || ' ' || COALESCE(r.endcp, 'N/A') || ' - ' || r.bairr || ', ' || r.munic || ' - ' || r.unfed || ', ' || COALESCE(r.nrcep, 'N/A')) AS endereco_entrega,
-        (r.nrddd || ' '  || r.nrtel) AS tel
-      FROM fc12400 r
-      WHERE r.dtentg = current_date
+    SELECT
+    r.cdfilentg F_ROMANEIO,
+    r.nrentg AS N_ROMANEIO,
+    r.dtentg AS DATA,
+    r.hrentg AS HORA,
+    r.obsentg AS OBSERVACAI,
+    
+    r.ender AS ENDERECI,
+    r.endnr AS N_ENDERECO,
+    COALESCE(r.endcp, 'N/A') AS COMPLEMENTO,
+    r.bairr AS BAIRRO,
+    r.munic AS MUNICIPIO,
+    r.unfed AS UF,
+    COALESCE(r.nrcep, 'N/A') as CEP,
+    
+    r.nrddd AS NR_DDD,
+    r.nrtel AS NR_TELEFONE
+    
+    FROM fc12400 r
+    
+    WHERE 1=1
+    AND   r.dtentg = current_date
     `;
 
     db.query(sqlQuery, [], (err, result) => {
@@ -672,6 +685,7 @@ app.get('/itens_romaneio', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
