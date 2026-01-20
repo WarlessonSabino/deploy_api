@@ -618,11 +618,11 @@ app.get('/romaneios_dia', (req, res) => {
     
     r.ender AS ENDERECI,
     r.endnr AS N_ENDERECO,
-    COALESCE(r.endcp, 'N/A') AS COMPLEMENTO,
+    r.endcp AS COMPLEMENTO,
     r.bairr AS BAIRRO,
     r.munic AS MUNICIPIO,
     r.unfed AS UF,
-    COALESCE(r.nrcep, 'N/A') as CEP,
+    r.nrcep as CEP,
     
     r.nrddd AS NR_DDD,
     r.nrtel AS NR_TELEFONE
@@ -686,6 +686,7 @@ app.get('/itens_romaneio', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
