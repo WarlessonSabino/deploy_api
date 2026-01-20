@@ -605,44 +605,40 @@ app.get('/vendas_unidade', (req, res) => {
 
 app.get('/romaneios_dia', (req, res) => {
 
-  const { inicio, fim } = req.query;
-
-  if (!inicio || !fim) {
-    return res.status(400).send('Parâmetros inicio e fim são obrigatórios');
-  }
-
   Firebird.attach(dbConfig, (err, db) => {
     if (err) return res.status(500).send('Erro ao conectar ao banco de dados');
 
     const sqlQuery = `
-      SELECT
-        r.cdfilentg AS F_ROMANEIO,
-        r.nrentg AS N_ROMANEIO,
-        r.dtentg AS DATA,
-        r.hrentg AS HORA,
-        r.obsentg AS OBSERVACAO,
-        r.ender AS ENDERECO,
-        r.endnr AS N_ENDERECO,
-        COALESCE(r.endcp, 'N/A') AS COMPLEMENTO,
-        r.bairr AS BAIRRO,
-        r.munic AS MUNICIPIO,
-        r.unfed AS UF,
-        COALESCE(r.nrcep, 'N/A') AS CEP,
-        r.nrddd AS NR_DDD,
-        r.nrtel AS NR_TELEFONE
-      FROM fc12400 r
-      WHERE r.dtentg BETWEEN ? AND ?
+    SELECT
+    r.cdfilentg F_ROMANEIO,
+    r.nrentg AS N_ROMANEIO,
+    r.dtentg AS DATA,
+    r.hrentg AS HORA,
+    r.obsentg AS OBSERVACAI,
+    
+    r.ender AS ENDERECI,
+    r.endnr AS N_ENDERECO,
+    COALESCE(r.endcp, 'N/A') AS COMPLEMENTO,
+    r.bairr AS BAIRRO,
+    r.munic AS MUNICIPIO,
+    r.unfed AS UF,
+    COALESCE(r.nrcep, 'N/A') as CEP,
+    
+    r.nrddd AS NR_DDD,
+    r.nrtel AS NR_TELEFONE
+    
+    FROM fc12400 r
+    
+    WHERE 1=1
+    AND   r.dtentg = current_date
     `;
 
-    db.query(sqlQuery, [inicio, fim], (err, result) => {
+    db.query(sqlQuery, [], (err, result) => {
       db.detach();
-
       if (err) return res.status(500).send('Erro ao executar a consulta');
-      if (!result || result.length === 0) return res.status(404).send('Nenhum romaneio encontrado no período');
-
+      if (!result || result.length === 0) return res.status(404).send('Nenhum romaneio encontrado hoje');
       return res.json(result);
     });
-
   });
 
 });
@@ -690,6 +686,7 @@ app.get('/itens_romaneio', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
