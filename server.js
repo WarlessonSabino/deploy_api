@@ -604,44 +604,54 @@ app.get('/vendas_unidade', (req, res) => {
 });
 
 app.get('/romaneios_dia', (req, res) => {
+  const { inicio, fim } = req.query;
+
+  // validação mínima
+  if (!inicio || !fim) {
+    return res.status(400).json({
+      erro: "Parâmetros 'inicio' e 'fim' são obrigatórios. Ex: ?inicio=2026-01-20&fim=2026-01-21"
+    });
+  }
 
   Firebird.attach(dbConfig, (err, db) => {
     if (err) return res.status(500).send('Erro ao conectar ao banco de dados');
 
     const sqlQuery = `
-    SELECT
-    r.cdfilentg F_ROMANEIO,
-    r.nrentg AS N_ROMANEIO,
-    r.dtentg AS DATA,
-    r.hrentg AS HORA,
-    r.obsentg AS OBSERVACAI,
-    
-    r.ender AS ENDERECI,
-    r.endnr AS N_ENDERECO,
-    r.endcp AS COMPLEMENTO,
-    r.bairr AS BAIRRO,
-    r.munic AS MUNICIPIO,
-    r.unfed AS UF,
-    r.nrcep as CEP,
-    
-    r.nrddd AS NR_DDD,
-    r.nrtel AS NR_TELEFONE
-    
-    FROM fc12400 r
-    
-    WHERE 1=1
-    AND   r.dtentg = current_date
+      SELECT
+        r.cdfilentg AS F_ROMANEIO,
+        r.nrentg AS N_ROMANEIO,
+        r.dtentg AS DATA,
+        r.hrentg AS HORA,
+        r.obsentg AS OBSERVACAO,
+
+        r.ender AS ENDERECO,
+        r.endnr AS N_ENDERECO,
+        r.endcp AS COMPLEMENTO,
+        r.bairr AS BAIRRO,
+        r.munic AS MUNICIPIO,
+        r.unfed AS UF,
+        r.nrcep AS CEP,
+
+        r.nrddd AS NR_DDD,
+        r.nrtel AS NR_TELEFONE
+
+      FROM fc12400 r
+      WHERE r.dtentg BETWEEN ? AND ?
     `;
 
-    db.query(sqlQuery, [], (err, result) => {
+    db.query(sqlQuery, [inicio, fim], (err, result) => {
       db.detach();
+
       if (err) return res.status(500).send('Erro ao executar a consulta');
-      if (!result || result.length === 0) return res.status(404).send('Nenhum romaneio encontrado hoje');
+      if (!result || result.length === 0) {
+        return res.status(404).json({ mensagem: "Nenhum romaneio encontrado no período" });
+      }
+
       return res.json(result);
     });
   });
-
 });
+
 
 
 app.get('/itens_romaneio', (req, res) => {
@@ -686,6 +696,7 @@ app.get('/itens_romaneio', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
