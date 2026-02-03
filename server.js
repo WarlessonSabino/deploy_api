@@ -578,13 +578,20 @@ app.get('/vendas_unidade', (req, res) => {
     }
 
     const sqlQuery = `
-      SELECT
+    SELECT
         f.cdfil,
         COUNT(DISTINCT f.nrrqu) AS Req,
-        SUM(f.prcobr - f.vrdsc) AS Total
-      FROM fc12100 f
-      WHERE f.dtentr = current_date
-      GROUP BY f.cdfil
+        SUM(f.prcobr - f.vrdsc) AS Total,
+        COUNT(DISTINCT f.cdcli) AS Quantidade_Clientes,
+        COUNT(DISTINCT CASE 
+            WHEN c.dtcad = current_date 
+            THEN f.cdcli 
+        END) AS Novos_Clientes
+    FROM fc12100 f
+    LEFT JOIN fc07000 c 
+        ON c.cdcli = f.cdcli
+    WHERE f.dtentr = current_date
+    GROUP BY f.cdfil;
     `;
 
     db.query(sqlQuery, [], (err, result) => {
@@ -696,6 +703,7 @@ app.get('/itens_romaneio', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
