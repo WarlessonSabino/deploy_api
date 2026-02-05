@@ -466,7 +466,12 @@ app.get('/requisicoes-cliente', (req, res) => {
                 CASE 
                     WHEN fc.tpformafarma = 6 THEN 'Produto de Revenda'
                     ELSE 'Fórmula Manipulada'
-                END AS TIPO
+                END AS TIPO,
+                fc.volume,
+                fc.univol,
+                fc.qtcont AS DOSE,
+                fc.dtval AS VALIDADE,
+                fc.vrliqdav AS "R$ Fórmula"
             FROM fc12100 fc
 
             INNER JOIN
@@ -703,6 +708,7 @@ app.get('/itens_romaneio', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
