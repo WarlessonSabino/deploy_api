@@ -67,6 +67,7 @@ app.get('/requisicoes', (req, res) => {
             END AS "Quantidade",
 
             CASE fc15100.tpformafarma
+                WHEN 2 THEN fc15100.qtfor || ' de ' || fc15100.qtcont || ' ' || fc15100.univol || ' Total ' || (fc15100.qtfor * fc15100.qtcont) || ' ' || fc15100.univol
                 WHEN 3 THEN fc15100.qtfor || ' de ' || fc15100.qtcont || ' ' || fc15100.univol
                 WHEN 4 THEN fc15100.qtfor || ' de ' || fc15100.qtcont || ' ' || fc15100.univol
                 WHEN 5 THEN fc15100.qtfor || ' de ' || fc15100.qtcont || ' ' || fc15100.univol
@@ -708,6 +709,7 @@ app.get('/itens_romaneio', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
