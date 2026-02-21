@@ -338,7 +338,9 @@ app.get('/requisicoes', (req, res) => {
             (fc04000.nrcrm || '-' || fc04000.ufcrm ) AS CRM,
             fc04000.nomemed AS MEDICO,
 
-             fc08000.nomefun AS VENDEDOR
+             fc08000.nomefun AS VENDEDOR,
+
+             fc15100.OBSERFIC
     
 
             FROM
@@ -709,6 +711,7 @@ app.get('/itens_romaneio', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
