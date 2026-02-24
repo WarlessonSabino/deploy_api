@@ -340,7 +340,7 @@ app.get('/requisicoes', (req, res) => {
 
              fc08000.nomefun AS VENDEDOR,
 
-             fc15100.OBSERFIC
+             fc15100.OBSERFIC AS OBS
     
 
             FROM
@@ -711,6 +711,7 @@ app.get('/itens_romaneio', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
