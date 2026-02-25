@@ -340,12 +340,15 @@ app.get('/requisicoes', (req, res) => {
 
              fc08000.nomefun AS VENDEDOR,
 
-             fc15100.OBSERFIC AS OBS
+             fc15000.OBSPA AS OBS
     
 
             FROM
                 fc15100
 
+
+            LEFT JOIN
+            fc15000 on fc15000.nrorc = fc15100.nrorc AND fc15000.cdfil = fc15100.cdfil
 
             LEFT JOIN
             fc15110 on fc15110.nrorc = fc15100.nrorc AND fc15110.cdfil = fc15100.cdfil and fc15110.serieo = fc15100.serieo
@@ -711,6 +714,7 @@ app.get('/itens_romaneio', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
