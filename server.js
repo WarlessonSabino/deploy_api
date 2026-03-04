@@ -710,10 +710,40 @@ app.get('/itens_romaneio', (req, res) => {
   });
 });
 
+function parseIntList(value) {
+  if (!value) return [];
+  return String(value)
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean)
+    .map(n => Number(n))
+    .filter(n => Number.isInteger(n) && n > 0);
+}
+
+function parseTerminalList(value) {
+  if (!value) return [];
+  return String(value)
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean)
+    .filter(t => /^[0-9]{2}$/.test(t)); // só "00".."99"
+}
+
+function placeholders(n) {
+  return Array.from({ length: n }, () => "?").join(",");
+}
+
+// VENDAS DO DIA (filial obrigatório)
 app.get('/vendas_dia', (req, res) => {
+  const filiais = parseIntList(req.query.filiais);
+  if (!filiais.length) {
+    return res.status(400).send("Parâmetro 'filiais' é obrigatório. Ex: ?filiais=1,2");
+  }
+
   Firebird.attach(dbConfig, (err, db) => {
     if (err) return res.status(500).send('Erro ao conectar ao banco de dados');
 
+    const params = [...filiais];
     const sqlQuery = `
       SELECT
         fc.dtentr   AS DATA,
@@ -724,23 +754,32 @@ app.get('/vendas_dia', (req, res) => {
         fc.vrliqdav AS VALOR_VENDA
       FROM fc12100 fc
       WHERE fc.dtentr = current_date
-        AND fc.cdfil IN (1,2)
+        AND fc.cdfil IN (${placeholders(filiais.length)})
     `;
 
-    db.query(sqlQuery, [], (err, result) => {
+    db.query(sqlQuery, params, (err, result) => {
       db.detach();
-
       if (err) return res.status(500).send('Erro ao executar a consulta');
       if (!result || result.length === 0) return res.status(404).send('Nenhuma venda encontrada hoje');
-
       return res.json(result);
     });
   });
 });
 
+// BAIXAS DO CAIXA (filial obrigatório + terminais opcional)
 app.get('/caixa_baixas_dia', (req, res) => {
+  const filiais = parseIntList(req.query.filiais);
+  if (!filiais.length) {
+    return res.status(400).send("Parâmetro 'filiais' é obrigatório. Ex: ?filiais=1,2");
+  }
+
+  const terminais = parseTerminalList(req.query.terminais);
+  const terminaisEfetivos = terminais.length ? terminais : ['03', '04', '12'];
+
   Firebird.attach(dbConfig, (err, db) => {
     if (err) return res.status(500).send('Erro ao conectar ao banco de dados');
+
+    const params = [...terminaisEfetivos, ...filiais];
 
     const sqlQuery = `
       SELECT
@@ -749,26 +788,24 @@ app.get('/caixa_baixas_dia', (req, res) => {
         c.vrliq  AS VALOR_BAIXADO
       FROM fc31110 c
       WHERE c.dtope = current_date
-        AND c.cdtml IN ('03','04','12')
-        AND c.cdfilr IN (1,2)
+        AND c.cdtml IN (${placeholders(terminaisEfetivos.length)})
+        AND c.cdfilr IN (${placeholders(filiais.length)})
     `;
 
-    db.query(sqlQuery, [], (err, result) => {
+    db.query(sqlQuery, params, (err, result) => {
       db.detach();
-
       if (err) return res.status(500).send('Erro ao executar a consulta');
       if (!result || result.length === 0) return res.status(404).send('Nenhuma baixa encontrada hoje');
-
       return res.json(result);
     });
   });
 });
 
 
-
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
