@@ -710,10 +710,6 @@ app.get('/itens_romaneio', (req, res) => {
   });
 });
 
-/**
- * NOVO ENDPOINT 1: VENDAS DO DIA (fc12100)
- * Retorna todas as vendas do dia atual.
- */
 app.get('/vendas_dia', (req, res) => {
   Firebird.attach(dbConfig, (err, db) => {
     if (err) return res.status(500).send('Erro ao conectar ao banco de dados');
@@ -728,6 +724,7 @@ app.get('/vendas_dia', (req, res) => {
         fc.vrliqdav AS VALOR_VENDA
       FROM fc12100 fc
       WHERE fc.dtentr = current_date
+        AND fc.cdfil IN (1,2)
     `;
 
     db.query(sqlQuery, [], (err, result) => {
@@ -741,10 +738,6 @@ app.get('/vendas_dia', (req, res) => {
   });
 });
 
-/**
- * NOVO ENDPOINT 2: BAIXAS DO CAIXA DO DIA (fc31110)
- * Filtra apenas cdtml em ('03','04','12').
- */
 app.get('/caixa_baixas_dia', (req, res) => {
   Firebird.attach(dbConfig, (err, db) => {
     if (err) return res.status(500).send('Erro ao conectar ao banco de dados');
@@ -757,6 +750,7 @@ app.get('/caixa_baixas_dia', (req, res) => {
       FROM fc31110 c
       WHERE c.dtope = current_date
         AND c.cdtml IN ('03','04','12')
+        AND c.cdfilr IN (1,2)
     `;
 
     db.query(sqlQuery, [], (err, result) => {
@@ -771,9 +765,11 @@ app.get('/caixa_baixas_dia', (req, res) => {
 });
 
 
+
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
