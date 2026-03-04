@@ -790,6 +790,12 @@ app.get('/caixa_baixas_dia', (req, res) => {
         card.tpfuncaotef AS CARTAO,
         c.vrliq  AS VALOR_BAIXADO
       FROM fc31110 c
+
+    LEFT JOIN
+    fc31600 fm ON fm.operid = c.operid AND fm.nrcpm = c.nrcpm
+    LEFT JOIN
+    fc99f00 card ON card.cdadm = fm.cdadm
+
       WHERE c.dtope = current_date
         AND c.cdtml IN (${placeholders(terminaisEfetivos.length)})
         AND c.cdfilr IN (${placeholders(filiais.length)})
@@ -808,6 +814,7 @@ app.get('/caixa_baixas_dia', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
