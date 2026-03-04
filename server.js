@@ -785,9 +785,9 @@ app.get('/caixa_baixas_dia', (req, res) => {
       SELECT
         c.cdfilr AS ID_FILIAL,
         c.cdpro  AS NR_REQ,
-        fm.fmpag  COD_PAGAMENTO,
-        fm.cdpix  PIX,
-        card.tpfuncaotef  CARTAO,
+        fm.fmpag AS COD_PAGAMENTO,
+        fm.cdpix AS PIX,
+        card.tpfuncaotef AS CARTAO,
         c.vrliq  AS VALOR_BAIXADO
       FROM fc31110 c
       WHERE c.dtope = current_date
@@ -808,5 +808,6 @@ app.get('/caixa_baixas_dia', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
