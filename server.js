@@ -756,7 +756,7 @@ app.get('/vendas_dia', (req, res) => {
       FROM fc12100 fc
 
       LEFT JOIN
-        fc08000 f ON f.cdfun = fc.cdfunre AND f.cdfun = fc.cdfunre
+        fc08000 f ON f.cdfun = fc.cdfunre AND f.cdcon = fc.cdconre
 
       WHERE fc.dtentr = current_date
         AND fc.cdfil IN (${placeholders(filiais.length)})
@@ -819,6 +819,7 @@ app.get('/caixa_baixas_dia', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
