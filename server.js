@@ -758,7 +758,7 @@ app.get('/vendas_dia', (req, res) => {
       LEFT JOIN
         fc08000 f ON f.cdfun = fc.cdfunre AND f.cdcon = fc.cdconre
 
-      WHERE fc.dtentr = current_date
+      WHERE fc.dtentr BETWEEN current_date - 7 AND current_date
         AND fc.cdfil IN (${placeholders(filiais.length)})
     `;
 
@@ -796,12 +796,12 @@ app.get('/caixa_baixas_dia', (req, res) => {
         c.vrliq  AS VALOR_BAIXADO
       FROM fc31110 c
 
-    LEFT JOIN
+    LEFT JOIN 
     fc31600 fm ON fm.operid = c.operid AND fm.nrcpm = c.nrcpm
     LEFT JOIN
     fc99f00 card ON card.cdadm = fm.cdadm
 
-      WHERE c.dtope = current_date
+      WHERE c.dtope BETWEEN current_date - 7 AND current_date
         AND c.cdtml IN (${placeholders(terminaisEfetivos.length)})
         AND c.cdfilr IN (${placeholders(filiais.length)})
     `;
@@ -819,6 +819,7 @@ app.get('/caixa_baixas_dia', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
