@@ -738,20 +738,15 @@ app.get('/vendas_dia', (req, res) => {
 
   const filiais = parseIntList(req.query.filiais);
   const dataInicio = req.query.data_inicio;
+  const dataFim = req.query.data_fim;
 
   if (!filiais.length) {
     return res.status(400).send("Parâmetro 'filiais' é obrigatório. Ex: ?filiais=1,2");
   }
 
-  if (!dataInicio) {
-    return res.status(400).send("Parâmetro 'data_inicio' é obrigatório. Ex: ?data_inicio=2026-03-01");
+  if (!dataInicio || !dataFim) {
+    return res.status(400).send("Parâmetros 'data_inicio' e 'data_fim' são obrigatórios.");
   }
-
-  const inicio = new Date(dataInicio);
-  const fim = new Date(inicio);
-  fim.setDate(fim.getDate() + 7);
-
-  const dataFim = fim.toISOString().slice(0,10);
 
   Firebird.attach(dbConfig, (err, db) => {
     if (err) return res.status(500).send('Erro ao conectar ao banco de dados');
@@ -769,8 +764,8 @@ app.get('/vendas_dia', (req, res) => {
         fc.vrliqdav AS VALOR_VENDA
       FROM fc12100 fc
 
-      LEFT JOIN fc08000 f 
-        ON f.cdfun = fc.cdfunre 
+      LEFT JOIN fc08000 f
+        ON f.cdfun = fc.cdfunre
        AND f.cdcon = fc.cdconre
 
       WHERE fc.dtentr BETWEEN ? AND ?
@@ -785,8 +780,8 @@ app.get('/vendas_dia', (req, res) => {
 
       return res.json(result);
     });
-
   });
+
 });
 
 // BAIXAS DO CAIXA (filial obrigatório + terminais opcional)
@@ -794,23 +789,18 @@ app.get('/caixa_baixas_dia', (req, res) => {
 
   const filiais = parseIntList(req.query.filiais);
   const dataInicio = req.query.data_inicio;
+  const dataFim = req.query.data_fim;
 
   if (!filiais.length) {
     return res.status(400).send("Parâmetro 'filiais' é obrigatório. Ex: ?filiais=1,2");
   }
 
-  if (!dataInicio) {
-    return res.status(400).send("Parâmetro 'data_inicio' é obrigatório. Ex: ?data_inicio=2026-03-01");
+  if (!dataInicio || !dataFim) {
+    return res.status(400).send("Parâmetros 'data_inicio' e 'data_fim' são obrigatórios.");
   }
 
   const terminais = parseTerminalList(req.query.terminais);
   const terminaisEfetivos = terminais.length ? terminais : ['03', '04', '12'];
-
-  const inicio = new Date(dataInicio);
-  const fim = new Date(inicio);
-  fim.setDate(fim.getDate() + 7);
-
-  const dataFim = fim.toISOString().slice(0,10);
 
   Firebird.attach(dbConfig, (err, db) => {
     if (err) return res.status(500).send('Erro ao conectar ao banco de dados');
@@ -828,11 +818,11 @@ app.get('/caixa_baixas_dia', (req, res) => {
         c.vrliq  AS VALOR_BAIXADO
       FROM fc31110 c
 
-      LEFT JOIN fc31600 fm 
-        ON fm.operid = c.operid 
+      LEFT JOIN fc31600 fm
+        ON fm.operid = c.operid
        AND fm.nrcpm = c.nrcpm
 
-      LEFT JOIN fc99f00 card 
+      LEFT JOIN fc99f00 card
         ON card.cdadm = fm.cdadm
 
       WHERE c.dtope BETWEEN ? AND ?
@@ -855,6 +845,7 @@ app.get('/caixa_baixas_dia', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
