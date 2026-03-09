@@ -815,12 +815,17 @@ app.get('/caixa_baixas_dia', (req, res) => {
         fm.fmpag AS COD_PAGAMENTO,
         fm.cdpix AS PIX,
         card.tpfuncaotef AS CARTAO,
-        c.vrliq  AS VALOR_BAIXADO
+        SUM(bc.vrrcbpre + bc.vrrcb) AS VALOR_BAIXADO
       FROM fc31110 c
 
       LEFT JOIN fc31600 fm
         ON fm.operid = c.operid
        AND fm.nrcpm = c.nrcpm
+
+      LEFT JOIN fc17000 bc 
+      ON bc.nrrqu = c.cdpro
+      AND bc.cdfil = c.cdfilr
+      
 
       LEFT JOIN fc99f00 card
         ON card.cdadm = fm.cdadm
@@ -845,6 +850,7 @@ app.get('/caixa_baixas_dia', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
