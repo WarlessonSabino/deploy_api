@@ -833,6 +833,14 @@ app.get('/caixa_baixas_dia', (req, res) => {
       WHERE c.dtope BETWEEN ? AND ?
         AND c.cdtml IN (${placeholders(terminaisEfetivos.length)})
         AND c.cdfilr IN (${placeholders(filiais.length)})
+
+      GROUP BY
+       c.dtope,
+       c.cdfilr,
+       c.cdpro,
+       fm.fmpag,
+       fm.cdpix,
+       card.tpfuncaotef;
     `;
 
     db.query(sqlQuery, params, (err, result) => {
@@ -850,6 +858,7 @@ app.get('/caixa_baixas_dia', (req, res) => {
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
+
 
 
 
