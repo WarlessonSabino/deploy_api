@@ -550,30 +550,47 @@ app.get('/componentes-req', (req, res) => {
 });
 
 app.get('/orcamentos_rejeitados', (req, res) => {
+  const { dataInicio, dataFim } = req.query;
+
+  if (!dataInicio || !dataFim) {
+    return res.status(400).json({
+      erro: 'Os parâmetros dataInicio e dataFim são obrigatórios'
+    });
+  }
+
   Firebird.attach(dbConfig, (err, db) => {
     if (err) {
-      return res.status(500).send('Erro ao conectar ao banco de dados');
+      return res.status(500).json({
+        erro: 'Erro ao conectar ao banco de dados',
+        detalhe: err.message
+      });
     }
 
     const sqlQuery = `
       SELECT
         f.cdfil,
-        SUM(f.prcobr - f.vrdsc) AS Total
+        SUM(f.prcobr - f.vrdsc) AS total
       FROM fc15100 f
-      WHERE f.dtentr = current_date
+      WHERE f.dtentr BETWEEN ? AND ?
         AND f.qtaprov = 0
       GROUP BY f.cdfil
+      ORDER BY f.cdfil
     `;
 
-    db.query(sqlQuery, [], (err, result) => {
+    db.query(sqlQuery, [dataInicio, dataFim], (err, result) => {
       db.detach();
 
       if (err) {
-        return res.status(500).send('Erro ao executar a consulta');
+        return res.status(500).json({
+          erro: 'Erro ao executar a consulta',
+          detalhe: err.message
+        });
       }
 
       if (!result || result.length === 0) {
-        return res.status(404).send('Nenhum registro encontrado');
+        return res.status(404).json({
+          erro: 'Nenhum registro encontrado'
+        });
       }
 
       return res.json(result);
