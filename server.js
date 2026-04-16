@@ -337,7 +337,8 @@ app.get('/requisicoes', (req, res) => {
 
             (fc04000.nrcrm || '-' || fc04000.ufcrm ) AS CRM,
             fc04000.nomemed AS MEDICO,
-
+             fc15100.cdconre AS FILIAL_VENDEDOR,
+             fc15100.cdfunre AS CODIGO_VENDEDOR,
              fc08000.nomefun AS VENDEDOR,
 
              fc15000.OBSPA AS OBS
