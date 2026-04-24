@@ -753,10 +753,11 @@ function placeholders(n) {
 
 // VENDAS DO DIA (filial obrigatório)
 app.get('/vendas_dia', (req, res) => {
-
   const filiais = parseIntList(req.query.filiais);
   const dataInicio = req.query.data_inicio;
   const dataFim = req.query.data_fim;
+
+  const nrrqu = req.query.nrrqu ? Number(req.query.nrrqu) : null;
 
   if (!filiais.length) {
     return res.status(400).send("Parâmetro 'filiais' é obrigatório. Ex: ?filiais=1,2");
@@ -766,10 +767,23 @@ app.get('/vendas_dia', (req, res) => {
     return res.status(400).send("Parâmetros 'data_inicio' e 'data_fim' são obrigatórios.");
   }
 
+  if (req.query.nrrqu && !Number.isFinite(nrrqu)) {
+    return res.status(400).send("Parâmetro 'nrrqu' inválido. Informe apenas números.");
+  }
+
   Firebird.attach(dbConfig, (err, db) => {
-    if (err) return res.status(500).send('Erro ao conectar ao banco de dados');
+    if (err) {
+      return res.status(500).send('Erro ao conectar ao banco de dados');
+    }
 
     const params = [dataInicio, dataFim, ...filiais];
+
+    let filtroNrrqu = '';
+
+    if (nrrqu !== null) {
+      filtroNrrqu = ' AND fc.nrrqu = ?';
+      params.push(nrrqu);
+    }
 
     const sqlQuery = `
       SELECT
@@ -777,6 +791,9 @@ app.get('/vendas_dia', (req, res) => {
         fc.cdfil    AS ID_FILIAL,
         fc.nrrqu    AS NR_REQ,
         f.nomefun   AS REPRESENTANTE,
+        c.nomecli   AS CLIENTE,
+        dc.nrddd    AS DDD_CLI,
+        dc.nrtel    AS TEL_CLI,
         fc.cdfilo   AS ID_FILIAL_ORC,
         fc.nrorc    AS NR_ORC,
         fc.vrliqdav AS VALOR_VENDA
@@ -786,20 +803,31 @@ app.get('/vendas_dia', (req, res) => {
         ON f.cdfun = fc.cdfunre
        AND f.cdcon = fc.cdconre
 
+      LEFT JOIN fc07000 c
+        ON c.cdcli = fc.cdcli
+
+      LEFT JOIN fc07200 dc
+        ON dc.cdcli = c.cdcli
+
       WHERE fc.dtentr BETWEEN ? AND ?
         AND fc.cdfil IN (${placeholders(filiais.length)})
+        ${filtroNrrqu}
     `;
 
     db.query(sqlQuery, params, (err, result) => {
       db.detach();
 
-      if (err) return res.status(500).send('Erro ao executar a consulta');
-      if (!result || result.length === 0) return res.status(404).send('Nenhuma venda encontrada');
+      if (err) {
+        return res.status(500).send('Erro ao executar a consulta');
+      }
+
+      if (!result || result.length === 0) {
+        return res.status(404).send('Nenhuma venda encontrada');
+      }
 
       return res.json(result);
     });
   });
-
 });
 
 // BAIXAS DO CAIXA (filial obrigatório + terminais opcional)
