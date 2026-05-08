@@ -846,7 +846,7 @@ app.get('/caixa_baixas_dia', (req, res) => {
   }
 
   const terminais = parseTerminalList(req.query.terminais);
-  const terminaisEfetivos = terminais.length ? terminais : ['03', '04', '12'];
+  const terminaisEfetivos = terminais.length ? terminais : ['03', '04', '12', '22'];
 
   Firebird.attach(dbConfig, (err, db) => {
     if (err) return res.status(500).send('Erro ao conectar ao banco de dados');
