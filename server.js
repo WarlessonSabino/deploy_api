@@ -467,7 +467,7 @@ app.get('/requisicoes-cliente', (req, res) => {
         }
 
         const sqlQuery = `
-            SELECT FIRST 5
+            SELECT
                 (fc.cdfil || ' - ' || fc.nrrqu) AS PROTOCOLO,
                 fc.dtentr AS DATA_PEDIDO,
                 CASE 
@@ -481,10 +481,13 @@ app.get('/requisicoes-cliente', (req, res) => {
                 fc.vrliqdav AS "R$ Fórmula"
             FROM fc12100 fc
 
-            INNER JOIN
-            fc07000 c ON c.cdcli = fc.cdcli   
+            INNER JOIN fc07000 c 
+                ON c.cdcli = fc.cdcli   
             
-            WHERE c.nrcnpj = ?
+            WHERE 
+                c.nrcnpj = ?
+                AND fc.dtentr >= DATEADD(-6 MONTH TO CURRENT_DATE)
+
             ORDER BY fc.dtentr DESC
         `;
 
@@ -492,6 +495,7 @@ app.get('/requisicoes-cliente', (req, res) => {
             db.detach();
 
             if (err) {
+                console.error(err);
                 return res.status(500).send('Erro ao executar a consulta');
             }
 
