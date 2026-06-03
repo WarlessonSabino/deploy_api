@@ -644,9 +644,8 @@ app.get('/vendas_unidade', (req, res) => {
 });
 
 app.get('/romaneios_dia', (req, res) => {
-  const { inicio, fim } = req.query;
+  const { inicio, fim, tpentg } = req.query;
 
-  // validação mínima
   if (!inicio || !fim) {
     return res.status(400).json({
       erro: "Parâmetros 'inicio' e 'fim' são obrigatórios. Ex: ?inicio=2026-01-20&fim=2026-01-21"
@@ -654,9 +653,11 @@ app.get('/romaneios_dia', (req, res) => {
   }
 
   Firebird.attach(dbConfig, (err, db) => {
-    if (err) return res.status(500).send('Erro ao conectar ao banco de dados');
+    if (err) {
+      return res.status(500).send('Erro ao conectar ao banco de dados');
+    }
 
-    const sqlQuery = `
+    let sqlQuery = `
       SELECT
         r.cdfilentg AS F_ROMANEIO,
         r.nrentg AS N_ROMANEIO,
@@ -672,6 +673,15 @@ app.get('/romaneios_dia', (req, res) => {
         r.unfed AS UF,
         r.nrcep AS CEP,
 
+        r.tpentg,
+
+        CASE r.tpentg
+          WHEN 2 THEN 'Sedex'
+          WHEN 1 THEN 'MotoBoy'
+          WHEN 3 THEN 'Outros (Rio)'
+          ELSE 'Loja'
+        END AS TipoEntrega,
+
         r.nrddd AS NR_DDD,
         r.nrtel AS NR_TELEFONE
 
@@ -679,19 +689,30 @@ app.get('/romaneios_dia', (req, res) => {
       WHERE r.dtentg BETWEEN ? AND ?
     `;
 
-    db.query(sqlQuery, [inicio, fim], (err, result) => {
+    const params = [inicio, fim];
+
+    if (tpentg) {
+      sqlQuery += ' AND r.tpentg = ?';
+      params.push(parseInt(tpentg));
+    }
+
+    db.query(sqlQuery, params, (err, result) => {
       db.detach();
 
-      if (err) return res.status(500).send('Erro ao executar a consulta');
+      if (err) {
+        return res.status(500).send('Erro ao executar a consulta');
+      }
+
       if (!result || result.length === 0) {
-        return res.status(404).json({ mensagem: "Nenhum romaneio encontrado no período" });
+        return res.status(404).json({
+          mensagem: 'Nenhum romaneio encontrado no período'
+        });
       }
 
       return res.json(result);
     });
   });
 });
-
 
 
 app.get('/itens_romaneio', (req, res) => {
