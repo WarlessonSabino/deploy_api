@@ -521,21 +521,88 @@ app.get('/componentes-req', (req, res) => {
         }
 
         const sqlQuery = `
-            SELECT
-                p.descrprd AS PRODUTO,
-                cf.quant AS QUANTIDADE,
-                cf.unida AS UNIDADE,
-                f.posol AS POSOLOGIA
-            FROM fc12110 cf
-            INNER JOIN fc12100 f 
-                ON f.cdfil = cf.cdfil 
-               AND f.nrrqu = cf.nrrqu
-            INNER JOIN fc03000 p 
-                ON p.cdpro = cf.cdprin
-            WHERE cf.cdfil = ?
-              AND cf.nrrqu = ?
-              AND cf.tpcmp = 'C'
-            ORDER BY cf.itemid ASC
+            WITH base AS (
+    SELECT
+        cf.cdfil,
+        cf.nrrqu,
+        cf.itemid,
+        cf.quant,
+        cf.unida,
+        f.posol,
+
+        TRIM(
+            CASE
+                WHEN cf.cdpro <> cf.cdprin THEN
+                    CASE
+                        WHEN fc03200.descrprd IS NOT NULL
+                             AND POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(cf.descr))) > 0
+                        THEN fc03200.descrprd
+                        ELSE cf.descr
+                    END
+
+                WHEN cf.cdpro = cf.cdprin
+                     AND UPPER(TRIM(cf.descr)) <> UPPER(TRIM(fc03000.descr))
+                     AND UPPER(TRIM(cf.descr)) <> UPPER(TRIM(fc03000.descrprd))
+                THEN cf.descr
+
+                WHEN UPPER(TRIM(cf.descr)) = UPPER(TRIM(fc03000.descr))
+                THEN fc03000.descrprd
+
+                WHEN fc03000.descrprd IS NULL
+                THEN cf.descr
+
+                ELSE fc03000.descrprd
+            END
+        ) AS produto_base
+    
+        FROM fc12110 cf
+    
+        INNER JOIN fc12100 f 
+            ON f.cdfil = cf.cdfil 
+           AND f.nrrqu = cf.nrrqu
+    
+        LEFT JOIN fc03000 
+            ON fc03000.cdpro = cf.cdprin
+    
+        LEFT JOIN fc03200 
+            ON fc03200.cdsin = cf.cdpro
+    
+        WHERE cf.cdfil = ?
+          AND cf.nrrqu = ?
+          AND cf.tpcmp = 'C'
+        )
+        
+        SELECT
+            TRIM(
+                CASE
+                    WHEN POSITION('DERMATO' IN UPPER(produto_base)) > 0 THEN
+                        SUBSTRING(produto_base FROM 1 FOR POSITION('DERMATO' IN UPPER(produto_base)) - 1)
+        
+                    WHEN POSITION('DILUIDO' IN UPPER(produto_base)) > 0 THEN
+                        SUBSTRING(produto_base FROM 1 FOR POSITION('DILUIDO' IN UPPER(produto_base)) - 1)
+        
+                    WHEN POSITION('USAR ESTE' IN UPPER(produto_base)) > 0 THEN
+                        SUBSTRING(produto_base FROM 1 FOR POSITION('USAR ESTE' IN UPPER(produto_base)) - 1)
+        
+                    WHEN POSITION('NAO USAR' IN UPPER(produto_base)) > 0 THEN
+                        SUBSTRING(produto_base FROM 1 FOR POSITION('NAO USAR' IN UPPER(produto_base)) - 1)
+        
+                    WHEN POSITION('ACIMA DE' IN UPPER(produto_base)) > 0 THEN
+                        SUBSTRING(produto_base FROM 1 FOR POSITION('ACIMA DE' IN UPPER(produto_base)) - 1)
+        
+                    WHEN POSITION('ABAIXO DE' IN UPPER(produto_base)) > 0 THEN
+                        SUBSTRING(produto_base FROM 1 FOR POSITION('ABAIXO DE' IN UPPER(produto_base)) - 1)
+        
+                    ELSE produto_base
+                END
+            ) AS PRODUTO,
+        
+            quant AS QUANTIDADE,
+            unida AS UNIDADE,
+            posol AS POSOLOGIA
+
+FROM base
+ORDER BY itemid ASC
         `;
 
         db.query(sqlQuery, [cdfil, nrrqu], (err, result) => {
