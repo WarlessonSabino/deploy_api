@@ -402,6 +402,173 @@ app.get('/requisicoes', (req, res) => {
     });
 });
 
+app.get('/requisicoes-cliente', (req, res) => {
+    const { cpfclientedav } = req.query;
+
+    if (!cpfclientedav) {
+        return res.status(400).send('Parâmetro cpfclientedav é obrigatório');
+    }
+
+    Firebird.attach(dbConfig, (err, db) => {
+        if (err) {
+            return res.status(500).send('Erro ao conectar ao banco de dados');
+        }
+
+        const sqlQuery = `
+            SELECT
+                (fc.cdfil || ' - ' || fc.nrrqu) AS PROTOCOLO,
+                fc.dtentr AS DATA_PEDIDO,
+                CASE 
+                    WHEN fc.tpformafarma = 6 THEN 'Produto de Revenda'
+                    ELSE 'Fórmula Manipulada'
+                END AS TIPO,
+                fc.volume,
+                fc.univol,
+                fc.qtcont AS DOSE,
+                fc.dtval AS VALIDADE,
+                fc.vrliqdav AS "R$ Fórmula"
+            FROM fc12100 fc
+
+            INNER JOIN fc07000 c 
+                ON c.cdcli = fc.cdcli   
+            
+            WHERE 
+                c.nrcnpj = ?
+                AND fc.dtentr >= DATEADD(-6 MONTH TO CURRENT_DATE)
+
+            ORDER BY fc.dtentr DESC
+        `;
+
+        db.query(sqlQuery, [cpfclientedav], (err, result) => {
+            db.detach();
+
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Erro ao executar a consulta');
+            }
+
+            if (!result || result.length === 0) {
+                return res.status(404).send('Nenhuma requisição encontrada');
+            }
+
+            return res.json(result);
+        });
+    });
+});
+
+app.get('/componentes-req', (req, res) => {
+    const { cdfil, nrrqu } = req.query;
+
+    if (!cdfil || !nrrqu) {
+        return res.status(400).send('Parâmetros cdfil e nrrqu são obrigatórios');
+    }
+
+    Firebird.attach(dbConfig, (err, db) => {
+        if (err) {
+            return res.status(500).send('Erro ao conectar ao banco de dados');
+        }
+
+        const sqlQuery = `
+            WITH base AS (
+    SELECT
+        cf.cdfil,
+        cf.nrrqu,
+        cf.itemid,
+        cf.quant,
+        cf.unida,
+        f.posol,
+
+        TRIM(
+            CASE
+                WHEN cf.cdpro <> cf.cdprin THEN
+                    CASE
+                        WHEN fc03200.descrprd IS NOT NULL
+                             AND POSITION(UPPER(TRIM(fc03200.descrprd)) IN UPPER(TRIM(cf.descr))) > 0
+                        THEN fc03200.descrprd
+                        ELSE cf.descr
+                    END
+
+                WHEN cf.cdpro = cf.cdprin
+                     AND UPPER(TRIM(cf.descr)) <> UPPER(TRIM(fc03000.descr))
+                     AND UPPER(TRIM(cf.descr)) <> UPPER(TRIM(fc03000.descrprd))
+                THEN cf.descr
+
+                WHEN UPPER(TRIM(cf.descr)) = UPPER(TRIM(fc03000.descr))
+                THEN fc03000.descrprd
+
+                WHEN fc03000.descrprd IS NULL
+                THEN cf.descr
+
+                ELSE fc03000.descrprd
+            END
+        ) AS produto_base
+    
+        FROM fc12110 cf
+    
+        INNER JOIN fc12100 f 
+            ON f.cdfil = cf.cdfil 
+           AND f.nrrqu = cf.nrrqu
+    
+        LEFT JOIN fc03000 
+            ON fc03000.cdpro = cf.cdprin
+    
+        LEFT JOIN fc03200 
+            ON fc03200.cdsin = cf.cdpro
+    
+        WHERE cf.cdfil = ?
+          AND cf.nrrqu = ?
+          AND cf.tpcmp = 'C'
+        )
+        
+        SELECT
+            TRIM(
+                CASE
+                    WHEN POSITION('DERMATO' IN UPPER(produto_base)) > 0 THEN
+                        SUBSTRING(produto_base FROM 1 FOR POSITION('DERMATO' IN UPPER(produto_base)) - 1)
+        
+                    WHEN POSITION('DILUIDO' IN UPPER(produto_base)) > 0 THEN
+                        SUBSTRING(produto_base FROM 1 FOR POSITION('DILUIDO' IN UPPER(produto_base)) - 1)
+        
+                    WHEN POSITION('USAR ESTE' IN UPPER(produto_base)) > 0 THEN
+                        SUBSTRING(produto_base FROM 1 FOR POSITION('USAR ESTE' IN UPPER(produto_base)) - 1)
+        
+                    WHEN POSITION('NAO USAR' IN UPPER(produto_base)) > 0 THEN
+                        SUBSTRING(produto_base FROM 1 FOR POSITION('NAO USAR' IN UPPER(produto_base)) - 1)
+        
+                    WHEN POSITION('ACIMA DE' IN UPPER(produto_base)) > 0 THEN
+                        SUBSTRING(produto_base FROM 1 FOR POSITION('ACIMA DE' IN UPPER(produto_base)) - 1)
+        
+                    WHEN POSITION('ABAIXO DE' IN UPPER(produto_base)) > 0 THEN
+                        SUBSTRING(produto_base FROM 1 FOR POSITION('ABAIXO DE' IN UPPER(produto_base)) - 1)
+        
+                    ELSE produto_base
+                END
+            ) AS PRODUTO,
+        
+            quant AS QUANTIDADE,
+            unida AS UNIDADE,
+            posol AS POSOLOGIA
+
+FROM base
+ORDER BY itemid ASC
+        `;
+
+        db.query(sqlQuery, [cdfil, nrrqu], (err, result) => {
+            db.detach();
+
+            if (err) {
+                return res.status(500).send('Erro ao executar a consulta');
+            }
+
+            if (!result || result.length === 0) {
+                return res.status(404).send('Nenhum componente encontrado');
+            }
+
+            return res.json(result);
+        });
+    });
+});
+
 
 app.listen(3000, () => {
     console.log('API em funcionamento.');
