@@ -569,6 +569,94 @@ ORDER BY itemid ASC
     });
 });
 
+app.get('/orcamentos_rejeitados', (req, res) => {
+  const { dataInicio, dataFim } = req.query;
+
+  if (!dataInicio || !dataFim) {
+    return res.status(400).json({
+      erro: 'Os parâmetros dataInicio e dataFim são obrigatórios'
+    });
+  }
+
+  Firebird.attach(dbConfig, (err, db) => {
+    if (err) {
+      return res.status(500).json({
+        erro: 'Erro ao conectar ao banco de dados',
+        detalhe: err.message
+      });
+    }
+
+    const sqlQuery = `
+      SELECT
+        f.cdfil,
+        SUM(f.prcobr - f.vrdsc) AS total
+      FROM fc15100 f
+      WHERE f.dtentr BETWEEN ? AND ?
+        AND f.qtaprov = 0
+      GROUP BY f.cdfil
+      ORDER BY f.cdfil
+    `;
+
+    db.query(sqlQuery, [dataInicio, dataFim], (err, result) => {
+      db.detach();
+
+      if (err) {
+        return res.status(500).json({
+          erro: 'Erro ao executar a consulta',
+          detalhe: err.message
+        });
+      }
+
+      if (!result || result.length === 0) {
+        return res.status(404).json({
+          erro: 'Nenhum registro encontrado'
+        });
+      }
+
+      return res.json(result);
+    });
+  });
+});
+
+
+app.get('/vendas_unidade', (req, res) => {
+  Firebird.attach(dbConfig, (err, db) => {
+    if (err) {
+      return res.status(500).send('Erro ao conectar ao banco de dados');
+    }
+
+    const sqlQuery = `
+    SELECT
+        f.cdfil,
+        COUNT(DISTINCT f.nrrqu) AS Req,
+        SUM(f.prcobr - f.vrdsc) AS Total,
+        COUNT(DISTINCT f.cdcli) AS Quantidade_Clientes,
+        COUNT(DISTINCT CASE 
+            WHEN c.dtcad = current_date 
+            THEN f.cdcli 
+        END) AS Novos_Clientes
+    FROM fc12100 f
+    LEFT JOIN fc07000 c 
+        ON c.cdcli = f.cdcli
+    WHERE f.dtentr = current_date
+    GROUP BY f.cdfil;
+    `;
+
+    db.query(sqlQuery, [], (err, result) => {
+      db.detach();
+
+      if (err) {
+        return res.status(500).send('Erro ao executar a consulta');
+      }
+
+      if (!result || result.length === 0) {
+        return res.status(404).send('Nenhum registro encontrado');
+      }
+
+      return res.json(result);
+    });
+  });
+});
 
 app.listen(3000, () => {
     console.log('API em funcionamento.');
