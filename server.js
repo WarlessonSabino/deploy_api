@@ -658,6 +658,8 @@ app.get('/vendas_unidade', (req, res) => {
   });
 });
 
+
+
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
