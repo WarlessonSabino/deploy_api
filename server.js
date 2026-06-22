@@ -570,6 +570,139 @@ ORDER BY itemid ASC
 });
 
 
+app.get('/romaneios_dia', (req, res) => {
+  const { inicio, fim, tpentg } = req.query;
+
+  if (!inicio || !fim) {
+    return res.status(400).json({
+      erro: "Parâmetros 'inicio' e 'fim' são obrigatórios. Ex: ?inicio=2026-01-20&fim=2026-01-21"
+    });
+  }
+
+  Firebird.attach(dbConfig, (err, db) => {
+    if (err) {
+      return res.status(500).send('Erro ao conectar ao banco de dados');
+    }
+
+    let sqlQuery = `
+      SELECT
+        r.cdfilentg AS F_ROMANEIO,
+        r.nrentg AS N_ROMANEIO,
+        r.dtentg AS DATA,
+        r.hrentg AS HORA,
+        r.obsentg AS OBSERVACAO,
+
+        r.ender AS ENDERECO,
+        r.endnr AS N_ENDERECO,
+        r.endcp AS COMPLEMENTO,
+        r.bairr AS BAIRRO,
+        r.munic AS MUNICIPIO,
+        r.unfed AS UF,
+        r.nrcep AS CEP,
+
+        r.tpentg,
+
+        CASE r.tpentg
+          WHEN 2 THEN 'Sedex'
+          WHEN 1 THEN 'MotoBoy'
+          WHEN 3 THEN 'Outros (Rio)'
+          ELSE 'Loja'
+        END AS TipoEntrega,
+
+        r.nrddd AS NR_DDD,
+        r.nrtel AS NR_TELEFONE
+
+      FROM fc12400 r
+      WHERE r.dtentg BETWEEN ? AND ?
+    `;
+
+    const params = [inicio, fim];
+
+    if (tpentg) {
+      sqlQuery += ' AND r.tpentg = ?';
+      params.push(parseInt(tpentg));
+    }
+
+    db.query(sqlQuery, params, (err, result) => {
+      db.detach();
+
+      if (err) {
+        return res.status(500).send('Erro ao executar a consulta');
+      }
+
+      if (!result || result.length === 0) {
+        return res.status(404).json({
+          mensagem: 'Nenhum romaneio encontrado no período'
+        });
+      }
+
+      return res.json(result);
+    });
+  });
+});
+
+
+app.get('/itens_romaneio', (req, res) => {
+  const { cdfilentg, nrentg } = req.query;
+
+  if (!cdfilentg || !nrentg) {
+    return res.status(400).send('Parâmetros cdfilentg e nrentg são obrigatórios');
+  }
+
+  Firebird.attach(dbConfig, (err, db) => {
+    if (err) return res.status(500).send('Erro ao conectar ao banco de dados');
+
+    const sqlQuery = `
+      SELECT
+        (dr.cdfilr || '-' || dr.cdpro) AS requisicao,
+        dr.vrliq,
+        c.cdcli,
+        c.nomecli
+      FROM fc12410 dr
+
+      INNER JOIN fc12100 req 
+        ON req.cdfil = dr.cdfilr 
+       AND req.nrrqu = dr.cdpro
+
+      INNER JOIN fc07000 c 
+        ON c.cdcli = req.cdcli
+
+      WHERE dr.cdfilentg = ?
+        AND dr.nrentg = ?
+    `;
+
+    db.query(sqlQuery, [cdfilentg, nrentg], (err, result) => {
+      db.detach();
+      if (err) return res.status(500).send('Erro ao executar a consulta');
+      if (!result || result.length === 0) return res.status(404).send('Nenhum item encontrado para o romaneio');
+      return res.json(result);
+    });
+  });
+});
+
+function parseIntList(value) {
+  if (!value) return [];
+  return String(value)
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean)
+    .map(n => Number(n))
+    .filter(n => Number.isInteger(n) && n > 0);
+}
+
+function parseTerminalList(value) {
+  if (!value) return [];
+  return String(value)
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean)
+    .filter(t => /^[0-9]{2}$/.test(t)); // só "00".."99"
+}
+
+function placeholders(n) {
+  return Array.from({ length: n }, () => "?").join(",");
+}
+
 app.listen(3000, () => {
     console.log('API em funcionamento.');
 });
