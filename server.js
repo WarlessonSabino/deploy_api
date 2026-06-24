@@ -7,6 +7,136 @@ const app = express();
 app.use(cors());
 
 // =========================
+// Bloqueio punitivo por IP
+// =========================
+app.set('trust proxy', true); // importante se usar Nginx, Cloudflare ou outro proxy reverso
+
+const ABUSE_MAX_STRIKES = Number(process.env.ABUSE_MAX_STRIKES || 3);
+const ABUSE_STRIKE_WINDOW_MS = Number(process.env.ABUSE_STRIKE_WINDOW_MS || 30 * 60 * 1000); // 30 minutos
+const ABUSE_PUNISH_DB_TIMEOUT = String(process.env.ABUSE_PUNISH_DB_TIMEOUT || 'true').toLowerCase() === 'true';
+
+const ABUSE_BLOCK_STEPS_MS = [
+  30 * 60 * 1000,      // 30 minutos
+  60 * 60 * 1000,      // 1 hora
+  2 * 60 * 60 * 1000,  // 2 horas
+  4 * 60 * 60 * 1000,  // 4 horas
+  8 * 60 * 60 * 1000,  // 8 horas
+  24 * 60 * 60 * 1000  // máximo 24 horas
+];
+
+const abuseMap = new Map();
+
+function getClientIp(req) {
+  return (
+    req.ip ||
+    String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() ||
+    req.socket?.remoteAddress ||
+    'unknown'
+  );
+}
+
+function getAbuseRecord(ip) {
+  const now = Date.now();
+
+  let record = abuseMap.get(ip);
+
+  if (!record) {
+    record = {
+      strikes: 0,
+      blockLevel: 0,
+      blockedUntil: 0,
+      lastStrikeAt: 0,
+      totalBlocks: 0
+    };
+
+    abuseMap.set(ip, record);
+  }
+
+  // Se passou a janela sem novas chamadas indevidas e não está bloqueado, zera apenas os strikes.
+  // O blockLevel é mantido para punir reincidência com tempos maiores.
+  if (
+    record.lastStrikeAt &&
+    now - record.lastStrikeAt > ABUSE_STRIKE_WINDOW_MS &&
+    now > record.blockedUntil
+  ) {
+    record.strikes = 0;
+  }
+
+  return record;
+}
+
+function registerBadRequest(req, reason = 'Chamada indevida') {
+  const ip = getClientIp(req);
+  const record = getAbuseRecord(ip);
+  const now = Date.now();
+
+  // Se já está bloqueado, não precisa somar strike de novo.
+  if (record.blockedUntil && now < record.blockedUntil) {
+    return record;
+  }
+
+  record.strikes += 1;
+  record.lastStrikeAt = now;
+
+  console.warn(`[ABUSE] IP ${ip} | strike ${record.strikes}/${ABUSE_MAX_STRIKES} | ${reason}`);
+
+  if (record.strikes >= ABUSE_MAX_STRIKES) {
+    const blockMs = ABUSE_BLOCK_STEPS_MS[Math.min(record.blockLevel, ABUSE_BLOCK_STEPS_MS.length - 1)];
+
+    record.blockedUntil = now + blockMs;
+    record.blockLevel += 1;
+    record.totalBlocks += 1;
+    record.strikes = 0;
+
+    console.warn(`[ABUSE] IP ${ip} bloqueado por ${Math.ceil(blockMs / 60000)} minutos | motivo: ${reason}`);
+  }
+
+  return record;
+}
+
+function registerTimeoutStrikeIfNeeded(req, reason, err) {
+  if (!req || !ABUSE_PUNISH_DB_TIMEOUT) return;
+
+  if (err?.code === 'DB_QUERY_TIMEOUT' || err?.code === 'DB_CONNECT_TIMEOUT') {
+    registerBadRequest(req, reason);
+  }
+}
+
+function abuseProtection(req, res, next) {
+  const ip = getClientIp(req);
+  const record = getAbuseRecord(ip);
+  const now = Date.now();
+
+  if (record.blockedUntil && now < record.blockedUntil) {
+    const secondsLeft = Math.ceil((record.blockedUntil - now) / 1000);
+
+    return res.status(429).json({
+      erro: 'Muitas chamadas indevidas. Acesso temporariamente bloqueado.',
+      bloqueado_por_segundos: secondsLeft,
+      tente_novamente_em_minutos: Math.ceil(secondsLeft / 60),
+      reincidencias: record.totalBlocks
+    });
+  }
+
+  return next();
+}
+
+// Limpeza simples para evitar crescimento infinito do Map em memória.
+setInterval(() => {
+  const now = Date.now();
+
+  for (const [ip, record] of abuseMap.entries()) {
+    const inactiveFor = now - Math.max(record.lastStrikeAt || 0, record.blockedUntil || 0);
+
+    if (inactiveFor > 24 * 60 * 60 * 1000 && now > record.blockedUntil) {
+      abuseMap.delete(ip);
+    }
+  }
+}, 60 * 60 * 1000).unref();
+
+app.use(abuseProtection);
+
+// =========================
 // Proteção operacional
 // =========================
 const REQUEST_TIMEOUT_MS = Number(process.env.REQUEST_TIMEOUT_MS || 45000);      // tempo máximo da requisição HTTP
@@ -19,6 +149,8 @@ app.use((req, res, next) => {
   req.setTimeout(REQUEST_TIMEOUT_MS);
 
   res.setTimeout(REQUEST_TIMEOUT_MS, () => {
+    registerBadRequest(req, `Timeout HTTP em ${req.method} ${req.originalUrl || req.url}`);
+
     if (!res.headersSent) {
       return res.status(504).json({
         erro: 'Tempo limite da solicitação excedido',
@@ -130,14 +262,23 @@ function queryWithTimeout(db, sqlQuery, params, callback, attempt = 0) {
   });
 }
 
-function executeFirebirdQuery(sqlQuery, params, callback) {
+function executeFirebirdQuery(reqOrSqlQuery, sqlOrParams, paramsOrCallback, maybeCallback) {
+  const hasRequest = typeof reqOrSqlQuery === 'object' && typeof sqlOrParams === 'string' && Array.isArray(paramsOrCallback);
+
+  const req = hasRequest ? reqOrSqlQuery : null;
+  const sqlQuery = hasRequest ? sqlOrParams : reqOrSqlQuery;
+  const params = hasRequest ? paramsOrCallback : sqlOrParams;
+  const callback = hasRequest ? maybeCallback : paramsOrCallback;
+
   attachWithRetry(dbConfig, (err, db) => {
     if (err) {
+      registerTimeoutStrikeIfNeeded(req, `Timeout de conexão Firebird em ${req?.method || ''} ${req?.originalUrl || req?.url || ''}`, err);
       return callback(err);
     }
 
     queryWithTimeout(db, sqlQuery, params, (queryErr, result) => {
       safeDetach(db);
+      registerTimeoutStrikeIfNeeded(req, `Timeout de consulta Firebird em ${req?.method || ''} ${req?.originalUrl || req?.url || ''}`, queryErr);
       return callback(queryErr, result);
     });
   });
@@ -162,6 +303,7 @@ app.get('/requisicoes', (req, res) => {
   const { nrorc, cdfil } = req.query;
 
   if (!nrorc || !cdfil) {
+    registerBadRequest(req, 'Parâmetros ausentes em /requisicoes');
     return res.status(400).send('Parâmetros nrorc e cdfil são obrigatórios');
   }
 
@@ -377,7 +519,7 @@ app.get('/requisicoes', (req, res) => {
     ORDER BY itemid ASC;
   `;
 
-  executeFirebirdQuery(sqlQuery, [nrorc, cdfil], (err, result) => {
+  executeFirebirdQuery(req, sqlQuery, [nrorc, cdfil], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Erro ao executar a consulta');
@@ -395,6 +537,7 @@ app.get('/requisicoes-cliente', (req, res) => {
   const { cpfclientedav } = req.query;
 
   if (!cpfclientedav) {
+    registerBadRequest(req, 'Parâmetro cpfclientedav ausente em /requisicoes-cliente');
     return res.status(400).send('Parâmetro cpfclientedav é obrigatório');
   }
 
@@ -422,7 +565,7 @@ app.get('/requisicoes-cliente', (req, res) => {
     ORDER BY fc.dtentr DESC
   `;
 
-  executeFirebirdQuery(sqlQuery, [cpfclientedav], (err, result) => {
+  executeFirebirdQuery(req, sqlQuery, [cpfclientedav], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Erro ao executar a consulta');
@@ -440,6 +583,7 @@ app.get('/componentes-req', (req, res) => {
   const { cdfil, nrrqu } = req.query;
 
   if (!cdfil || !nrrqu) {
+    registerBadRequest(req, 'Parâmetros ausentes em /componentes-req');
     return res.status(400).send('Parâmetros cdfil e nrrqu são obrigatórios');
   }
 
@@ -528,7 +672,7 @@ app.get('/componentes-req', (req, res) => {
     ORDER BY itemid ASC
   `;
 
-  executeFirebirdQuery(sqlQuery, [cdfil, nrrqu], (err, result) => {
+  executeFirebirdQuery(req, sqlQuery, [cdfil, nrrqu], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Erro ao executar a consulta');
@@ -546,6 +690,7 @@ app.get('/romaneios_dia', (req, res) => {
   const { inicio, fim, tpentg } = req.query;
 
   if (!inicio || !fim) {
+    registerBadRequest(req, 'Parâmetros inicio/fim ausentes em /romaneios_dia');
     return res.status(400).json({
       erro: "Parâmetros 'inicio' e 'fim' são obrigatórios. Ex: ?inicio=2026-01-20&fim=2026-01-21"
     });
@@ -590,7 +735,7 @@ app.get('/romaneios_dia', (req, res) => {
     params.push(parseInt(tpentg));
   }
 
-  executeFirebirdQuery(sqlQuery, params, (err, result) => {
+  executeFirebirdQuery(req, sqlQuery, params, (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Erro ao executar a consulta');
@@ -610,6 +755,7 @@ app.get('/itens_romaneio', (req, res) => {
   const { cdfilentg, nrentg } = req.query;
 
   if (!cdfilentg || !nrentg) {
+    registerBadRequest(req, 'Parâmetros ausentes em /itens_romaneio');
     return res.status(400).send('Parâmetros cdfilentg e nrentg são obrigatórios');
   }
 
@@ -632,7 +778,7 @@ app.get('/itens_romaneio', (req, res) => {
       AND dr.nrentg = ?
   `;
 
-  executeFirebirdQuery(sqlQuery, [cdfilentg, nrentg], (err, result) => {
+  executeFirebirdQuery(req, sqlQuery, [cdfilentg, nrentg], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Erro ao executar a consulta');
@@ -651,6 +797,7 @@ app.get('/orcamentos_rejeitados', (req, res) => {
   const filiais = parseIntList(filial);
 
   if (!dataInicio || !dataFim || filiais.length === 0) {
+    registerBadRequest(req, 'Parâmetros obrigatórios ausentes ou inválidos em /orcamentos_rejeitados');
     return res.status(400).json({
       erro: 'Os parâmetros dataInicio, dataFim e filial são obrigatórios. Ex: ?dataInicio=2026-06-01&dataFim=2026-06-23&filial=1,2,3'
     });
@@ -668,7 +815,7 @@ app.get('/orcamentos_rejeitados', (req, res) => {
     ORDER BY f.cdfil
   `;
 
-  executeFirebirdQuery(sqlQuery, [dataInicio, dataFim, ...filiais], (err, result) => {
+  executeFirebirdQuery(req, sqlQuery, [dataInicio, dataFim, ...filiais], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).json({
@@ -692,6 +839,7 @@ app.get('/vendas_unidade', (req, res) => {
   const filiais = parseIntList(filial);
 
   if (filiais.length === 0) {
+    registerBadRequest(req, 'Parâmetro filial ausente ou inválido em /vendas_unidade');
     return res.status(400).json({
       erro: 'Parâmetro filial é obrigatório. Ex: ?filial=1 ou ?filial=1,2,3'
     });
@@ -719,7 +867,7 @@ app.get('/vendas_unidade', (req, res) => {
     ORDER BY f.cdfil
   `;
 
-  executeFirebirdQuery(sqlQuery, filiais, (err, result) => {
+  executeFirebirdQuery(req, sqlQuery, filiais, (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).send('Erro ao executar a consulta');
